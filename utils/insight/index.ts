@@ -120,7 +120,7 @@ export async function insightPageCode({
         "shareForm, shareListWrap, shareList, shareItemPlaceholder, shareInput or shareError missing"
       );
 
-    const userShares = await getUserShares();
+    const userShares = await getUserShares({ insightSlug });
     if (userShares && userShares.length > 0) {
       shareList.innerHTML = "";
       userShares.map((share) => {
@@ -208,9 +208,11 @@ export async function insightPageCode({
       return null;
     }
   }
-  async function getUserShares() {
+  async function getUserShares({ insightSlug }: { insightSlug: string }) {
     try {
-      const res = await xano_shared_insight_pages.get("/get_user_shares");
+      const res = await xano_shared_insight_pages.get("/get_user_shares", {
+        insight_slug: insightSlug,
+      });
       const userSharesResponse = res.getBody() as UserShares[];
 
       return userSharesResponse;
