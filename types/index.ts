@@ -324,3 +324,8 @@ export interface Company {
   } | null)[];
   company_logo: null | { url: string };
 }
+
+export interface UserShares {
+  id: number;
+  shared_to: string;
+}
