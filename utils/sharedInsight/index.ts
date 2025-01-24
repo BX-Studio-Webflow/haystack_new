@@ -147,20 +147,25 @@ export async function sharedInsightPageCode({
           }
         });
 
-        if (insight.company_details.company_logo) {
+        if (insight.company_details?.company_logo) {
           companyImage!.src = insight.company_details.company_logo.url;
         } else {
-          companyImage!.src =
-            "https://logo.clearbit.com/" +
-            insight.company_details["company-website"];
-          fetch(
-            "https://logo.clearbit.com/" +
-              insight.company_details["company-website"]
-          ).catch(
-            () =>
-              (companyImage!.src =
-                "https://uploads-ssl.webflow.com/64a2a18ba276228b93b991d7/64c7c26d6639a8e16ee7797f_Frame%20427318722.webp")
-          );
+          if (insight?.company_details) {
+            companyImage!.src =
+              "https://logo.clearbit.com/" +
+              insight.company_details["company-website"];
+            fetch(
+              "https://logo.clearbit.com/" +
+                insight.company_details["company-website"]
+            ).catch(
+              () =>
+                (companyImage!.src =
+                  "https://uploads-ssl.webflow.com/64a2a18ba276228b93b991d7/64c7c26d6639a8e16ee7797f_Frame%20427318722.webp")
+            );
+          } else {
+            companyImage!.src =
+              "https://uploads-ssl.webflow.com/64a2a18ba276228b93b991d7/64c7c26d6639a8e16ee7797f_Frame%20427318722.webp";
+          }
         }
         curatedDateTargetWrapper?.classList[curatedDate ? "remove" : "add"](
           "hide"
@@ -181,7 +186,9 @@ export async function sharedInsightPageCode({
         );
         sourceAuthorTarget!.textContent = insight.source_author;
         insightName!.textContent = insight.name;
-        companyLink!.textContent = insight.company_details.name;
+        companyLink!.textContent = insight?.company_details
+          ? insight.company_details.name
+          : "";
         companyLink!.href = "/login";
         companyPictureLink!.href = "/login";
         insightRichtext!.innerHTML = insight["insight-detail"];
@@ -380,6 +387,7 @@ export async function sharedInsightPageCode({
         throw new Error("No insight returned");
       }
     } catch (error) {
+      console.log({ error });
       introLoader.remove();
       introTextWrap.remove();
       introWarn.setAttribute("dev-hide", "false");
