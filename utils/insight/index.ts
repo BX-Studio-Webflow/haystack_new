@@ -95,6 +95,9 @@ export async function insightPageCode({
     const shareList = shareCard?.querySelector<HTMLDivElement>(
       "[dev-target=share-list]"
     );
+    const shareShowMore = shareCard?.querySelector<HTMLDivElement>(
+      "[dev-target=show-more]"
+    );
     const shareItemPlaceholder = shareCard?.querySelector<HTMLDivElement>(
       "[dev-target=share-item-placeholder]"
     );
@@ -106,6 +109,7 @@ export async function insightPageCode({
       shareList,
       shareItemPlaceholder,
       shareSubmit,
+      shareShowMore,
     });
     if (
       !shareForm ||
@@ -114,10 +118,11 @@ export async function insightPageCode({
       !shareListWrap ||
       !shareList ||
       !shareItemPlaceholder ||
+      !shareShowMore ||
       !shareSubmit
     )
       return console.error(
-        "shareForm, shareListWrap, shareList, shareItemPlaceholder, shareInput or shareError missing"
+        "shareForm, shareListWrap, shareList,shareShowMore, shareItemPlaceholder, shareInput or shareError missing"
       );
 
     const userShares = await getUserShares({ insightSlug });
@@ -131,6 +136,10 @@ export async function insightPageCode({
         shareList.appendChild(shareItem);
       });
       shareListWrap.setAttribute("dev-hide", "false");
+
+      if (userShares.length > 3) {
+        shareShowMore.setAttribute("dev-hide", "false");
+      }
     }
     console.log({ userShares });
 
