@@ -34,7 +34,7 @@ export async function insightPageCode({
   const peopleCards = qsa(`[dev-target="people-card"]`);
   const eventCards = qsa(`[dev-target="event-card"]`);
   const sourceDocumentCard = qs(`[dev-target="source-document-card"]`);
-  const shareCard = qs(`[dev-target="share-card"]`);
+  const shareCards = qsa(`[dev-target="share-card"]`);
 
   const searchParams = new URLSearchParams(window.location.search);
   const insightSlug = searchParams.get("name");
@@ -46,8 +46,8 @@ export async function insightPageCode({
   //   xanoToken = lsXanoAuthToken;
   // }
 
-  if (shareCard && insightSlug) {
-    shareInit(shareCard, insightSlug);
+  if (shareCards && insightSlug) {
+    shareInit(shareCards, insightSlug);
   }
 
   if (lsUserFollowingFavourite) {
@@ -76,106 +76,111 @@ export async function insightPageCode({
     : await getUserFollowingAndFavourite();
   insightPageInit(insightSlug);
 
-  async function shareInit(shareCard: HTMLDivElement, insightSlug: string) {
-    const shareForm = shareCard.querySelector<HTMLFormElement>(
-      "[dev-target=share-form]"
-    );
-    const shareInput = shareForm?.querySelector<HTMLInputElement>(
-      "[dev-target=share-input]"
-    );
-    const shareError = shareForm?.querySelector<HTMLDivElement>(
-      "[dev-target=share-error]"
-    );
-    const shareSubmit = shareForm?.querySelector<HTMLDivElement>(
-      "[dev-target=share-submit]"
-    );
-    const shareListWrap = shareCard?.querySelector<HTMLDivElement>(
-      "[dev-target=share-list-wrap]"
-    );
-    const shareList = shareCard?.querySelector<HTMLDivElement>(
-      "[dev-target=share-list]"
-    );
-    const shareShowMore = shareCard?.querySelector<HTMLDivElement>(
-      "[dev-target=show-more]"
-    );
-    const shareItemPlaceholder = shareCard?.querySelector<HTMLDivElement>(
-      "[dev-target=share-item-placeholder]"
-    );
-    console.log({
-      shareForm,
-      shareInput,
-      shareError,
-      shareListWrap,
-      shareList,
-      shareItemPlaceholder,
-      shareSubmit,
-      shareShowMore,
-    });
-    if (
-      !shareForm ||
-      !shareInput ||
-      !shareError ||
-      !shareListWrap ||
-      !shareList ||
-      !shareItemPlaceholder ||
-      !shareShowMore ||
-      !shareSubmit
-    )
-      return console.error(
-        "shareForm, shareListWrap, shareList,shareShowMore, shareItemPlaceholder, shareInput or shareError missing"
+  function shareInit(
+    shareCards: NodeListOf<HTMLDivElement>,
+    insightSlug: string
+  ) {
+    shareCards.forEach(async (shareCard) => {
+      const shareForm = shareCard.querySelector<HTMLFormElement>(
+        "[dev-target=share-form]"
       );
-
-    const userShares = await getUserShares({ insightSlug });
-    if (userShares && userShares.length > 0) {
-      shareList.innerHTML = "";
-      userShares.map((share) => {
-        const shareItem = shareItemPlaceholder.cloneNode(
-          true
-        ) as HTMLDivElement;
-        shareItem.textContent = share.shared_to;
-        shareList.appendChild(shareItem);
+      const shareInput = shareForm?.querySelector<HTMLInputElement>(
+        "[dev-target=share-input]"
+      );
+      const shareError = shareForm?.querySelector<HTMLDivElement>(
+        "[dev-target=share-error]"
+      );
+      const shareSubmit = shareForm?.querySelector<HTMLDivElement>(
+        "[dev-target=share-submit]"
+      );
+      const shareListWrap = shareCard?.querySelector<HTMLDivElement>(
+        "[dev-target=share-list-wrap]"
+      );
+      const shareList = shareCard?.querySelector<HTMLDivElement>(
+        "[dev-target=share-list]"
+      );
+      const shareShowMore = shareCard?.querySelector<HTMLDivElement>(
+        "[dev-target=show-more]"
+      );
+      const shareItemPlaceholder = shareCard?.querySelector<HTMLDivElement>(
+        "[dev-target=share-item-placeholder]"
+      );
+      console.log({
+        shareForm,
+        shareInput,
+        shareError,
+        shareListWrap,
+        shareList,
+        shareItemPlaceholder,
+        shareSubmit,
+        shareShowMore,
       });
-      shareListWrap.setAttribute("dev-hide", "false");
+      if (
+        !shareForm ||
+        !shareInput ||
+        !shareError ||
+        !shareListWrap ||
+        !shareList ||
+        !shareItemPlaceholder ||
+        !shareShowMore ||
+        !shareSubmit
+      )
+        return console.error(
+          "shareForm, shareListWrap, shareList,shareShowMore, shareItemPlaceholder, shareInput or shareError missing"
+        );
 
-      if (userShares.length > 3) {
-        shareShowMore.setAttribute("dev-hide", "false");
-      }
-    }
-    console.log({ userShares });
-
-    shareForm.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      shareSubmit.classList.add("is-disabled");
-      const shareInputValue = shareInput.value;
-      const invalidMails = getInvalidEmails(shareInputValue.split(","));
-
-      if (invalidMails.length > 0) {
-        shareError.textContent = `Invalid mail(s) ${invalidMails.join()}`;
-        toggleError({ errorDiv: shareError, value: false });
-      } else {
-        const shareData = await shareInsight({
-          emails: shareInputValue,
-          insightSlug,
-          origin: window.location.origin,
+      const userShares = await getUserShares({ insightSlug });
+      if (userShares && userShares.length > 0) {
+        shareList.innerHTML = "";
+        userShares.map((share) => {
+          const shareItem = shareItemPlaceholder.cloneNode(
+            true
+          ) as HTMLDivElement;
+          shareItem.textContent = share.shared_to;
+          shareList.appendChild(shareItem);
         });
-        if (shareData && shareData.length > 0) {
-          shareList.innerHTML = "";
-          shareData.map((share) => {
-            const shareItem = shareItemPlaceholder.cloneNode(
-              true
-            ) as HTMLDivElement;
-            shareItem.textContent = share.shared_to;
-            shareList.appendChild(shareItem);
-          });
-          shareListWrap.setAttribute("dev-hide", "false");
-          shareInput.value = "";
-        }
-        toggleError({ errorDiv: shareError, value: true });
-      }
-      shareSubmit.classList.remove("is-disabled");
+        shareListWrap.setAttribute("dev-hide", "false");
 
-      console.log({ value: shareInput.value, insightSlug });
+        if (userShares.length > 3) {
+          shareShowMore.setAttribute("dev-hide", "false");
+        }
+      }
+      console.log({ userShares });
+
+      shareForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        shareSubmit.classList.add("is-disabled");
+        const shareInputValue = shareInput.value;
+        const invalidMails = getInvalidEmails(shareInputValue.split(","));
+
+        if (invalidMails.length > 0) {
+          shareError.textContent = `Invalid mail(s) ${invalidMails.join()}`;
+          toggleError({ errorDiv: shareError, value: false });
+        } else {
+          const shareData = await shareInsight({
+            emails: shareInputValue,
+            insightSlug,
+            origin: window.location.origin,
+          });
+          if (shareData && shareData.length > 0) {
+            shareList.innerHTML = "";
+            shareData.map((share) => {
+              const shareItem = shareItemPlaceholder.cloneNode(
+                true
+              ) as HTMLDivElement;
+              shareItem.textContent = share.shared_to;
+              shareList.appendChild(shareItem);
+            });
+            shareListWrap.setAttribute("dev-hide", "false");
+            shareInput.value = "";
+          }
+          toggleError({ errorDiv: shareError, value: true });
+        }
+        shareSubmit.classList.remove("is-disabled");
+
+        console.log({ value: shareInput.value, insightSlug });
+      });
     });
   }
 
