@@ -459,6 +459,7 @@ export async function sharedInsightPageCode({
           )!.style.cursor = "pointer";
           const anchor = document.createElement("a");
           anchor.href = "/login";
+          anchor.setAttribute("dev-tooltip", "");
           anchor.textContent = tagSpan!.textContent;
           anchor.style.cursor = "pointer";
           anchor.classList.add("tag-span-name");
