@@ -27,6 +27,7 @@ export async function sharedInsightPageCode({
   }
 
   sharedInsightPageInit(shareToken);
+  tooltipInit();
 
   async function sharedInsightPageInit(token: string | null) {
     const shareWrap = qs("[dev-target=share-wrap]");
@@ -481,5 +482,41 @@ export async function sharedInsightPageCode({
       month: "long",
       timeZone: "UTC",
     })} ${date.getUTCDate()}, ${date.getFullYear()}`;
+  }
+
+  function tooltipInit() {
+    const customTooltip = qs("[dev-target=custom-tooltip]");
+
+    document.addEventListener("mouseover", function (event) {
+      let target =
+        event.target instanceof HTMLElement
+          ? event.target.closest("[dev-tooltip]")
+          : null;
+      if (!target) return;
+
+      customTooltip.textContent =
+        target.getAttribute("dev-tooltip") ||
+        "Haystack license required to access this link";
+      customTooltip.classList.add("visible");
+
+      let rect = target.getBoundingClientRect();
+      let tooltipRect = customTooltip.getBoundingClientRect();
+
+      let left =
+        rect.left + window.scrollX + rect.width / 2 - tooltipRect.width / 2;
+      let top = rect.top + window.scrollY - tooltipRect.height - 10; // 10px gap
+
+      customTooltip.style.left = `${left}px`;
+      customTooltip.style.top = `${top}px`;
+    });
+
+    document.addEventListener("mouseout", function (event) {
+      if (
+        event.target instanceof HTMLElement &&
+        event.target.matches("[dev-tooltip]")
+      ) {
+        customTooltip.classList.remove("visible");
+      }
+    });
   }
 }
