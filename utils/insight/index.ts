@@ -152,7 +152,9 @@ export async function insightPageCode({
         e.stopPropagation();
         shareSubmit.classList.add("is-disabled");
         const shareInputValue = shareInput.value;
-        const invalidMails = getInvalidEmails(shareInputValue.split(","));
+        const invalidMails = getInvalidEmails(
+          shareInputValue.split(",").map((item) => item.trim())
+        );
 
         if (invalidMails.length > 0) {
           shareError.textContent = `Invalid mail(s) ${invalidMails.join()}`;
