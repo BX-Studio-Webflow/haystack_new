@@ -109,6 +109,8 @@ export interface UserFollowingAndFavourite {
     id: number;
     xano_user_id: number;
     insight_id: number[];
+    company_id: number[];
+    people_id: number[];
   };
 }
 
@@ -324,8 +326,109 @@ export interface Company {
   } | null)[];
   company_logo: null | { url: string };
 }
+export interface CompanyV2 {
+  id: number;
+  created_at: number;
+  name: string;
+  slug: string;
+  "company-linkedin-profile-link": string;
+  "company-website": string;
+  company_type_id: number;
+  "description-small": string;
+  company_logo: null | { url: string };
+  published: boolean;
+}
+export interface InsightV2 {
+  id: number;
+  created_at: number;
+  name: string;
+  slug: string;
+  company_id: number | null;
+  description: string;
+  "insight-detail": string;
+  curated: Date | null;
+  source_author: string;
+  source: string;
+  "source-url": string;
+  "source-publication-date": Date | null;
+  source_category_id: ({ id: number; name: string; slug: string } | null | 0)[];
+  company_type_id: ({ id: number; name: string; slug: string } | null | 0)[];
+  insight_classification_id: (
+    | { id: number; name: string; slug: string }
+    | null
+    | 0
+  )[];
+  line_of_business_id: (
+    | { id: number; name: string; slug: string }
+    | null
+    | 0
+  )[];
+  technology_category_id: (
+    | { id: number; name: string; slug: string }
+    | null
+    | 0
+  )[];
+  "companies-mentioned": number[];
+  companies_mentioned: number[];
+  people_id: number[];
+  event_id: number;
+  company_details: {
+    id: number;
+    name: string;
+    slug: string;
+    "company-website": string;
+    company_logo: null | { url: string };
+  };
+  published: boolean;
+}
+export interface PersonV2 {
+  id: number;
+  name: string;
+  created_at: number;
+  slug: string;
+  title: string;
+  bio: string;
+  company_id: number;
+  email: string;
+  linkedin: string;
+  picture: null;
+  company_details: {
+    id: number;
+    name: string;
+    slug: string;
+  };
+  published: boolean;
+}
 
 export interface UserShares {
   id: number;
   shared_to: string;
 }
+
+export type UserFeedResponse = {
+  itemsReceived: number;
+  curPage: number;
+  nextPage: number;
+  prevPage: null;
+  offset: number;
+} & (
+  | { items: InsightV2[]; type: "insight" }
+  | { items: CompanyV2[]; type: "company" }
+  | { items: PersonV2[]; type: "people" }
+);
+
+export type SortOrder = "asc" | "desc" | "random";
+export type InsightItem = InsightV2 & { type: "insight" };
+export type CompanyItem = CompanyV2 & { type: "company" };
+export type PersonItem = PersonV2 & { type: "people" };
+export type MergedItem = InsightItem | CompanyItem | PersonItem;
+
+export type MergedResult = {
+  itemsReceived: number;
+  curPage: number;
+  nextPage: number;
+  prevPage: number | null;
+  offset: number;
+  items: MergedItem[];
+  returnTypeCount: Record<string, number>;
+};
