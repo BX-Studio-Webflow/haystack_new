@@ -176,7 +176,7 @@ export async function userFeedCode({
         insightSearchInput.value = "";
         userFeedSearchInputs.forEach((item) => {
           if (item === input) return;
-          item.value = "";
+          item.value = input.value;
         });
       });
     });
