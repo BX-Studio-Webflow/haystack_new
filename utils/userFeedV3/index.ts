@@ -492,10 +492,6 @@ export async function userFeedCode({
           `[dev-target="source-author"]`
         );
 
-        if (searchResultListWrapper)
-          searchResultListWrapper.style.height = "0px";
-        if (searchListWrap) searchAccordionLogic(searchListWrap);
-
         if (data.type === "insight") {
           if (insightDateWrap) insightDateWrap.style.display = "flex";
           if (searchTextDiv) searchTextDiv.style.display = "none";
@@ -839,6 +835,9 @@ export async function userFeedCode({
           });
           this.feedContainer.appendChild(newInsight);
         }
+        if (searchResultListWrapper)
+          searchResultListWrapper.style.height = "0px";
+        if (searchListWrap) searchAccordionLogic(searchListWrap);
       });
     }
     paginationLogic(userFeedData: MergedResult) {
@@ -1642,7 +1641,18 @@ export async function userFeedCode({
       return text; // return original text if inputs are invalid
     }
 
-    const regex = new RegExp(`(${query})`, "gi");
+    // Escape special regex characters and split query into words
+    const words = query
+      .split(/\s+/)
+      .map((word) => word.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"))
+      .filter(Boolean); // remove empty strings
+
+    if (words.length === 0) return text;
+
+    // Create regex to match any of the words, case-insensitive
+    const regex = new RegExp(`\\b(${words.join("|")})\\b`, "gi");
+
+    // Replace matches with <mark>
     return text.replace(regex, "<mark class='highlight'>$1</mark>");
   }
 
@@ -1650,22 +1660,28 @@ export async function userFeedCode({
     const trigger = item.querySelector<HTMLDivElement>(
       '[dev-target="search-list-trigger"]'
     );
+    const triggerIcon = trigger?.querySelector(`svg`)!;
     const wrapper = item.querySelector<HTMLDivElement>(
       '[dev-target="search-result-list-wrapper"]'
     );
     const content = item.querySelector<HTMLDivElement>(
       '[dev-target="search-result-list"]'
     );
+    const defaultHeight = content?.scrollHeight ?? 100;
+    console.log({ defaultHeight });
+    if (wrapper) wrapper.style.height = defaultHeight + "px";
 
-    let isOpen = false;
+    let isOpen = true;
 
     trigger?.addEventListener("click", function () {
       if (!isOpen) {
         const fullHeight = content?.scrollHeight ?? 100;
         if (wrapper) wrapper.style.height = fullHeight + "px";
+        triggerIcon.style.rotate = "0deg";
         isOpen = true;
       } else {
         if (wrapper) wrapper.style.height = "0px";
+        triggerIcon.style.rotate = "180deg";
         isOpen = false;
       }
     });
