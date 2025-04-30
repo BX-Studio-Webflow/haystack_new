@@ -875,10 +875,12 @@ export async function userFeedCode({
             behavior: "smooth",
           });
           // const scrollTopValue = window.innerWidth < 767 ? 220 : 130;
-          window.scrollTo({
-            top: 0,
-            behavior: "smooth",
-          });
+          if (window.innerWidth > 767) {
+            window.scrollTo({
+              top: 0,
+              behavior: "smooth",
+            });
+          }
           this.items = await this.geFeedFromServer({
             type: "all",
             page: curPage + 1,
