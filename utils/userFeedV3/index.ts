@@ -1668,7 +1668,6 @@ export async function userFeedCode({
       '[dev-target="search-result-list"]'
     );
     const defaultHeight = content?.scrollHeight ?? 100;
-    console.log({ defaultHeight });
     if (wrapper) wrapper.style.height = defaultHeight + "px";
 
     let isOpen = true;
