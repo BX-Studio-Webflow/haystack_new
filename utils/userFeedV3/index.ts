@@ -232,11 +232,6 @@ export async function userFeedCode({
 
     async lsInit() {
       this.items = this.getFeedFromLocalStorage();
-      console.log({
-        initType: "LS",
-        data: this.items,
-        userFollowingAndFavourite,
-      });
       if (this.items && userFollowingAndFavourite) {
         this.updateFeedContainer(this.items, userFollowingAndFavourite);
         this.filterFeed();
@@ -248,11 +243,6 @@ export async function userFeedCode({
       }
     ) {
       this.items = await this.geFeedFromServer({ type: "all", ...payload });
-      console.log({
-        initType: "Server",
-        data: this.items,
-        userFollowingAndFavourite,
-      });
       if (this.items && userFollowingAndFavourite) {
         this.updateFeedContainer(this.items, userFollowingAndFavourite);
         this.filterFeed();
@@ -1605,12 +1595,16 @@ export async function userFeedCode({
       sentences = [text];
     }
 
-    const lowerQuery = query.toLowerCase();
+    const queryWords = query
+      .split(/\s+/)
+      .map((word) => word.replace(/[.*+?^${}()|[\]\\]/g, "\\$&").toLowerCase())
+      .filter(Boolean);
+
+    const regex = new RegExp(`\\b(${queryWords.join("|")})\\b`, "gi");
     const highlighted: string[] = [];
 
     for (const sentence of sentences) {
-      if (sentence.toLowerCase().includes(lowerQuery)) {
-        const regex = new RegExp(`(${query})`, "gi");
+      if (queryWords.some((word) => sentence.toLowerCase().includes(word))) {
         let highlightedSentence = sentence
           .replace(regex, "<mark class='highlight'>$1</mark>")
           .trim();
