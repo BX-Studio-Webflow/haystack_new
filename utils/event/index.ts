@@ -32,6 +32,7 @@ export async function eventPageCode({
       techCat: [],
       lineOfBus: [],
       insightClass: [],
+      organization: [],
     },
   };
   const sortObject = {

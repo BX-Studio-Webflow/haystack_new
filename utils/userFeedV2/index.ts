@@ -35,6 +35,7 @@ export async function userFeedCode({
       techCat: [],
       lineOfBus: [],
       insightClass: [],
+      organization: [],
     },
   };
   const sortObject = {

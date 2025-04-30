@@ -30,6 +30,7 @@ export async function peoplePageCode({
       techCat: [],
       lineOfBus: [],
       insightClass: [],
+      organization: [],
     },
   };
   const sortObject = {

@@ -18,6 +18,7 @@ export interface InsightPayload {
       techCat?: number[];
       lineOfBus?: number[];
       insightClass?: number[];
+      organization?: number[];
     };
   };
 }
@@ -113,6 +114,15 @@ export interface UserFollowingAndFavourite {
     people_id: number[];
   };
 }
+export interface UserOrganizations {
+  id: number;
+  organization_id: {
+    id: number;
+    name: string;
+    slug: string;
+    email_domain: string;
+  }[];
+}
 
 export interface FilterResponse {
   id: number;
@@ -130,6 +140,7 @@ export interface SearchObject {
     techCat: number[];
     lineOfBus: number[];
     insightClass: number[];
+    organization: number[];
   };
 }
 

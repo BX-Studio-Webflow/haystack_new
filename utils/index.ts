@@ -42,3 +42,14 @@ export function formatCuratedDate(inputDate: Date) {
   const day = date.getDate();
   return `${months[month]} ${day.toString().padStart(2, "0")}, ${year}`;
 }
+export function toSentenceCase(str: string) {
+  if (!str) return "";
+  str = str.toLowerCase();
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+export function toTitleCase(str: string) {
+  return str.replace(/\w\S*/g, function (txt) {
+    return txt.charAt(0).toUpperCase() + txt.slice(1).toLowerCase();
+  });
+}
