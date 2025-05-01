@@ -12,7 +12,7 @@ import {
   type UserFollowingAndFavourite,
 } from "../../types/index";
 import { XanoClient } from "@xano/js-sdk";
-import { debounce, formatCuratedDate, qs, qsa, toTitleCase } from "..";
+import { debounce, formatCuratedDate, qs, qsa, slugify, toTitleCase } from "..";
 export async function userFeedCode({
   dataSource,
 }: {
@@ -211,7 +211,7 @@ export async function userFeedCode({
       ) as HTMLDivElement;
       this.organizationFilter = organizationFilter ?? [];
       this.name = toTitleCase(name);
-      this.localStorageKey = `userFeedData_${this.name}`;
+      this.localStorageKey = `userFeedData_${slugify(this.name)}`;
       this.endpoint = endpoint;
       this.menuItem.textContent = this.name;
       this.contentItem.classList["remove"]("active");
@@ -282,8 +282,8 @@ export async function userFeedCode({
         perPage = 0,
         offset = 0,
         type,
-        sortBy,
-        orderBy,
+        sortBy = "created_at",
+        orderBy = "desc",
       } = payload;
       try {
         const res = await xano_userFeed_v2.get(this.endpoint, {

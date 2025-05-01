@@ -53,3 +53,14 @@ export function toTitleCase(str: string) {
     return txt.charAt(0).toUpperCase() + txt.slice(1).toLowerCase();
   });
 }
+
+export function slugify(text: string): string {
+  return text
+    .toLowerCase()
+    .normalize("NFD") // Normalize accented characters
+    .replace(/[\u0300-\u036f]/g, "") // Remove diacritics
+    .replace(/[^a-z0-9\s-]/g, "") // Remove non-alphanumeric characters
+    .trim() // Remove leading/trailing whitespace
+    .replace(/[\s_-]+/g, "-") // Replace spaces and underscores with dashes
+    .replace(/^-+|-+$/g, ""); // Remove leading/trailing dashes
+}
