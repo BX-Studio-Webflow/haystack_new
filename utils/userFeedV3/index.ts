@@ -401,15 +401,18 @@ export async function userFeedCode({
           | "people";
         if (filterType === "all") {
           if (countDiv) {
-            return (countDiv.textContent = `(${Object.values(
-              mergedData.returnTypeCount
-            ).reduce((acc, value) => acc + value, 0)})`);
+            return (countDiv.textContent = this.feedSearch.value
+              ? `(${Object.values(mergedData.returnTypeCount).reduce(
+                  (acc, value) => acc + value,
+                  0
+                )})`
+              : "");
           }
         }
         if (countDiv) {
-          countDiv.textContent = `(${mergedData.returnTypeCount[
-            filterType
-          ].toString()})`;
+          countDiv.textContent = this.feedSearch.value
+            ? `(${mergedData.returnTypeCount[filterType].toString()})`
+            : "";
         }
       });
       mergedData.items.forEach((data) => {
@@ -496,11 +499,11 @@ export async function userFeedCode({
           );
           searchResultList!.innerHTML = "";
           searchCount!.textContent = `${searchList.length}`;
+          // if (searchList.length > 0) {
+          //   if (searchTextDiv) searchTextDiv.innerHTML = searchList[0];
+          //   if (searchTextDiv) searchTextDiv.style.display = "block";
+          // }
           if (searchList.length > 0) {
-            if (searchTextDiv) searchTextDiv.innerHTML = searchList[0];
-            if (searchTextDiv) searchTextDiv.style.display = "block";
-          }
-          if (searchList.length > 1) {
             if (searchListWrap) searchListWrap.style.display = "flex";
             searchList.forEach((item) => {
               const newSearchResultItem = searchResultItem!.cloneNode(
@@ -1600,23 +1603,40 @@ export async function userFeedCode({
       .map((word) => word.replace(/[.*+?^${}()|[\]\\]/g, "\\$&").toLowerCase())
       .filter(Boolean);
 
-    const regex = new RegExp(`\\b(${queryWords.join("|")})\\b`, "gi");
+    const regex = new RegExp(`(${queryWords.join("|")})`, "gi");
     const highlighted: string[] = [];
 
     for (const sentence of sentences) {
       if (queryWords.some((word) => sentence.toLowerCase().includes(word))) {
-        let highlightedSentence = sentence
-          .replace(regex, "<mark class='highlight'>$1</mark>")
-          .trim();
+        let snippet = sentence.trim();
 
         if (maxWords) {
-          const words = highlightedSentence.split(/\s+/);
-          if (words.length > maxWords) {
-            highlightedSentence = words.slice(0, maxWords).join(" ") + "...";
+          const words = snippet.split(/\s+/);
+          const matchIndex = words.findIndex((word) =>
+            queryWords.some((q) => word.toLowerCase().includes(q))
+          );
+
+          let snippetStart = 0;
+          if (matchIndex !== -1) {
+            snippetStart = Math.max(0, matchIndex - Math.floor(maxWords / 2));
+          }
+
+          const snippetWords = words.slice(
+            snippetStart,
+            snippetStart + maxWords
+          );
+          snippet = snippetWords.join(" ");
+          if (snippetStart + maxWords < words.length) {
+            snippet += "...";
           }
         }
 
-        highlighted.push(highlightedSentence);
+        const highlightedSnippet = snippet.replace(
+          regex,
+          "<mark class='highlight'>$1</mark>"
+        );
+
+        highlighted.push(highlightedSnippet);
 
         if (highlighted.length === maxSentences) break;
       }
@@ -1644,7 +1664,7 @@ export async function userFeedCode({
     if (words.length === 0) return text;
 
     // Create regex to match any of the words, case-insensitive
-    const regex = new RegExp(`\\b(${words.join("|")})\\b`, "gi");
+    const regex = new RegExp(`(${words.join("|")})`, "gi");
 
     // Replace matches with <mark>
     return text.replace(regex, "<mark class='highlight'>$1</mark>");
@@ -1661,10 +1681,12 @@ export async function userFeedCode({
     const content = item.querySelector<HTMLDivElement>(
       '[dev-target="search-result-list"]'
     );
-    const defaultHeight = content?.scrollHeight ?? 100;
-    if (wrapper) wrapper.style.height = defaultHeight + "px";
+    // const defaultHeight = content?.scrollHeight ?? 100;
+    // if (wrapper) wrapper.style.height = defaultHeight + "px";
+    if (wrapper) wrapper.style.height = "0px";
+    triggerIcon.style.rotate = "180deg";
 
-    let isOpen = true;
+    let isOpen = false;
 
     trigger?.addEventListener("click", function () {
       if (!isOpen) {
