@@ -223,8 +223,26 @@ export async function userFeedCode({
       this.customDropdown = new CustomDropdown(
         this.sortContainer,
         [
-          { label: "Most Relevant", orderBy: "desc", sortBy: "created_at" },
-          { label: "Least Relevant", orderBy: "asc", sortBy: "created_at" },
+          {
+            label: "Curated Date (Latest)",
+            orderBy: "desc",
+            sortBy: "curated",
+          },
+          {
+            label: "Curated Date (Oldest)",
+            orderBy: "asc",
+            sortBy: "curated",
+          },
+          {
+            label: "Source Published Date (Latest)",
+            orderBy: "desc",
+            sortBy: "source-publication-date",
+          },
+          {
+            label: "Source Published Date (Oldest)",
+            orderBy: "asc",
+            sortBy: "source-publication-date",
+          },
         ],
         this
       );
