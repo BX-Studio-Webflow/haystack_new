@@ -494,7 +494,7 @@ export async function userFeedCode({
             data["insight-detail"] ?? "",
             searchObject.search,
             5,
-            20,
+            30,
             true
           );
           searchResultList!.innerHTML = "";
@@ -595,11 +595,27 @@ export async function userFeedCode({
               );
           });
 
-          addTagsToInsight(sourceCatArray, tagsWrapperTarget!, false);
-          addTagsToInsight(companyTypeArray, tagsWrapperTarget!, false);
-          addTagsToInsight(insightClassArray, tagsWrapperTarget!, false);
-          // addTagsToInsight(lineOfBusArray, tagsWrapperTarget!, false);
           addTagsToInsight(
+            searchObject.search,
+            sourceCatArray,
+            tagsWrapperTarget!,
+            false
+          );
+          addTagsToInsight(
+            searchObject.search,
+            companyTypeArray,
+            tagsWrapperTarget!,
+            false
+          );
+          addTagsToInsight(
+            searchObject.search,
+            insightClassArray,
+            tagsWrapperTarget!,
+            false
+          );
+          // addTagsToInsight(searchObject.search,lineOfBusArray, tagsWrapperTarget!, false);
+          addTagsToInsight(
+            searchObject.search,
             techCatArray,
             tagsWrapperTarget!,
             true,
@@ -1359,6 +1375,7 @@ export async function userFeedCode({
   }
 
   function addTagsToInsight(
+    query: string,
     tagArray: (
       | 0
       | {
@@ -1403,7 +1420,7 @@ export async function userFeedCode({
           )!.style.cursor = "pointer";
           const anchor = document.createElement("a");
           anchor.href = `${route}/technology/${item.slug}`;
-          anchor.textContent = tagSpan!.textContent;
+          anchor.innerHTML = highlightQueryInText(tagSpan!.textContent!, query);
           anchor.style.cursor = "pointer";
           anchor.classList.add("tag-span-name");
           tagSpan?.replaceWith(anchor);
@@ -1598,22 +1615,36 @@ export async function userFeedCode({
       sentences = [text];
     }
 
-    const queryWords = query
-      .split(/\s+/)
-      .map((word) => word.replace(/[.*+?^${}()|[\]\\]/g, "\\$&").toLowerCase())
-      .filter(Boolean);
+    // Extract quoted phrases and unquoted words
+    const phraseRegex = /(["'])(.*?)\1/g;
+    const phrases: string[] = [];
+    let match;
+    while ((match = phraseRegex.exec(query)) !== null) {
+      if (match[2]) phrases.push(match[2]);
+    }
 
-    const regex = new RegExp(`(${queryWords.join("|")})`, "gi");
+    // Remove quoted phrases from query
+    const queryWithoutQuotes = query.replace(phraseRegex, "");
+    const individualWords = queryWithoutQuotes.split(/\s+/).filter(Boolean);
+
+    const allQueryParts = [...phrases, ...individualWords];
+
+    const escapedQueryWords = allQueryParts.map((word) =>
+      word.replace(/[.*+?^${}()|[\]\\]/g, "\\$&").toLowerCase()
+    );
+
+    const regex = new RegExp(`(${escapedQueryWords.join("|")})`, "gi");
     const highlighted: string[] = [];
 
     for (const sentence of sentences) {
-      if (queryWords.some((word) => sentence.toLowerCase().includes(word))) {
+      const lowerSentence = sentence.toLowerCase();
+      if (escapedQueryWords.some((word) => lowerSentence.includes(word))) {
         let snippet = sentence.trim();
 
         if (maxWords) {
           const words = snippet.split(/\s+/);
           const matchIndex = words.findIndex((word) =>
-            queryWords.some((q) => word.toLowerCase().includes(q))
+            escapedQueryWords.some((q) => word.toLowerCase().includes(q))
           );
 
           let snippetStart = 0;
@@ -1645,26 +1676,43 @@ export async function userFeedCode({
     return highlighted;
   }
 
-  function highlightQueryInText(text: string, query: string) {
+  function highlightQueryInText(text: string, query: string): string {
     if (
       !text ||
       !query ||
       typeof text !== "string" ||
       typeof query !== "string"
     ) {
-      return text; // return original text if inputs are invalid
+      return text;
     }
 
-    // Escape special regex characters and split query into words
-    const words = query
+    // Extract quoted phrases
+    const phraseRegex = /(["'])(.*?)\1/g;
+    const phrases: string[] = [];
+    let match;
+    while ((match = phraseRegex.exec(query)) !== null) {
+      if (match[2]) phrases.push(match[2]);
+    }
+
+    // Remove quoted phrases from query string
+    const queryWithoutQuotes = query.replace(phraseRegex, "");
+    const individualWords = queryWithoutQuotes
       .split(/\s+/)
-      .map((word) => word.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"))
-      .filter(Boolean); // remove empty strings
+      .map((w) => w.trim())
+      .filter(Boolean);
 
-    if (words.length === 0) return text;
+    // Combine all query parts
+    const allQueryParts = [...phrases, ...individualWords];
 
-    // Create regex to match any of the words, case-insensitive
-    const regex = new RegExp(`(${words.join("|")})`, "gi");
+    if (allQueryParts.length === 0) return text;
+
+    // Escape special characters for regex
+    const escapedParts = allQueryParts.map((word) =>
+      word.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
+    );
+
+    // Create regex for whole words/phrases
+    const regex = new RegExp(`(${escapedParts.join("|")})`, "gi");
 
     // Replace matches with <mark>
     return text.replace(regex, "<mark class='highlight'>$1</mark>");
