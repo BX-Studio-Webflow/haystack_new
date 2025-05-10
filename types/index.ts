@@ -399,6 +399,7 @@ export interface PersonV2 {
   slug: string;
   title: string;
   bio: string;
+  _company: { name: string; slug: string };
   company_id: number;
   email: string;
   linkedin: string;

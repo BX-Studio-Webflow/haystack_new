@@ -502,6 +502,9 @@ export async function userFeedCode({
         const sourceAuthorTarget = newInsight.querySelector(
           `[dev-target="source-author"]`
         );
+        const personDetailsWrap = newInsight.querySelector(
+          `[dev-target="person-details-wrap"]`
+        );
 
         if (data.type === "insight") {
           if (insightDateWrap) insightDateWrap.style.display = "flex";
@@ -790,6 +793,10 @@ export async function userFeedCode({
           if (searchListWrap) searchListWrap.style.display = "none";
           if (searchTextDiv) searchTextDiv.style.display = "none";
 
+          if (personDetailsWrap && data.title && data._company) {
+            personDetailsWrap.classList.remove("hide");
+            personDetailsWrap.textContent = `${data.title} | ${data._company.name}`;
+          }
           companyImage!.src = `https://cdn.prod.website-files.com/64a2a18ba276228b93b991d7/64e5ffe7398cb98da1effe5b_Frame%2011%20(1).webp`;
           insightNameTarget!.innerHTML = highlightQueryInText(
             data.name,
