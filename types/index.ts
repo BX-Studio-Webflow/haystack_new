@@ -423,6 +423,7 @@ export type UserFeedResponse = {
   nextPage: number;
   prevPage: null;
   offset: number;
+  itemsTotal: number;
 } & (
   | { items: InsightV2[]; type: "insight" }
   | { items: CompanyV2[]; type: "company" }
@@ -443,4 +444,5 @@ export type MergedResult = {
   offset: number;
   items: MergedItem[];
   returnTypeCount: Record<string, number>;
+  totalReturnTypeCount: Record<string, number>;
 };

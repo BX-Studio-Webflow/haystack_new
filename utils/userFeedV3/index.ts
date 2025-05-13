@@ -420,7 +420,7 @@ export async function userFeedCode({
         if (filterType === "all") {
           if (countDiv) {
             return (countDiv.textContent = this.feedSearch.value
-              ? `(${Object.values(mergedData.returnTypeCount).reduce(
+              ? `(${Object.values(mergedData.totalReturnTypeCount).reduce(
                   (acc, value) => acc + value,
                   0
                 )})`
@@ -429,7 +429,7 @@ export async function userFeedCode({
         }
         if (countDiv) {
           countDiv.textContent = this.feedSearch.value
-            ? `(${mergedData.returnTypeCount[filterType].toString()})`
+            ? `(${mergedData.totalReturnTypeCount[filterType].toString()})`
             : "";
         }
       });
@@ -1563,6 +1563,7 @@ export async function userFeedCode({
       offset: 0,
       items: [],
       returnTypeCount: {},
+      totalReturnTypeCount: {},
     };
 
     data.forEach((page) => {
@@ -1598,6 +1599,9 @@ export async function userFeedCode({
       // Optimized returnTypeCount using page-level type and itemsReceived
       merged.returnTypeCount[page.type] =
         (merged.returnTypeCount[page.type] || 0) + page.itemsReceived;
+
+      merged.totalReturnTypeCount[page.type] =
+        (merged.totalReturnTypeCount[page.type] || 0) + page.itemsTotal;
     });
 
     // Sort merged.items

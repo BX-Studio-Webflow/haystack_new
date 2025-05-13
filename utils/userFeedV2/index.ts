@@ -1656,6 +1656,7 @@ export async function userFeedCode({
       offset: 0,
       items: [],
       returnTypeCount: {},
+      totalReturnTypeCount: {},
     };
 
     data.forEach((page) => {
