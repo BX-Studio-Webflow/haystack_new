@@ -166,6 +166,7 @@ export async function userFeedCode({
     filterModalTrigger: HTMLDivElement;
     contentItem: HTMLDivElement;
     feedSearch: HTMLInputElement;
+    feedSearchLoader: HTMLInputElement;
     filtersWrap: HTMLDivElement;
     feedSortWrap: HTMLDivElement;
     feedContainer: HTMLDivElement;
@@ -202,6 +203,9 @@ export async function userFeedCode({
       ) as HTMLDivElement;
       this.feedSearch = this.contentItem.querySelector(
         "[dev-target=user-feed-search]"
+      ) as HTMLInputElement;
+      this.feedSearchLoader = this.contentItem.querySelector(
+        "[dev-target=search-loading-spinner]"
       ) as HTMLInputElement;
       this.emptyStateContainer = this.contentItem.querySelector(
         `[dev-tab-empty-state]`
@@ -267,7 +271,14 @@ export async function userFeedCode({
       }
       this.feedSearch.addEventListener("input", () => {
         searchObject.search = this.feedSearch.value;
-        searchDebounce();
+        searchDebounce(
+          () => {
+            this.feedSearchLoader.classList.remove("hide");
+          },
+          () => {
+            this.feedSearchLoader.classList.add("hide");
+          }
+        );
         insightSearchInput.value = "";
         customTab.tabs.forEach((tab) => {
           if (tab === this) return;
@@ -795,7 +806,10 @@ export async function userFeedCode({
 
           if (personDetailsWrap && data.title && data._company) {
             personDetailsWrap.classList.remove("hide");
-            personDetailsWrap.textContent = `${data.title} | ${data._company.name}`;
+            personDetailsWrap.innerHTML = highlightQueryInText(
+              `${data.title} | ${data._company.name}`,
+              searchObject.search
+            );
           }
           companyImage!.src = `https://cdn.prod.website-files.com/64a2a18ba276228b93b991d7/64e5ffe7398cb98da1effe5b_Frame%2011%20(1).webp`;
           insightNameTarget!.innerHTML = highlightQueryInText(
@@ -808,10 +822,6 @@ export async function userFeedCode({
             5
           );
 
-          if (searchList.length > 0) {
-            searchTextDiv!.innerHTML = searchList[0];
-            searchTextDiv!.style.display = "block";
-          }
           newInsight.setAttribute("dev-target", "people-feed-item");
           userFeedType!.textContent = "person";
           userFeedType!.classList.add("person");
@@ -1081,7 +1091,7 @@ export async function userFeedCode({
     contentItemTemplate
   );
   const favouriteTab = new Tab(
-    "favourite",
+    "favorite",
     "/favourite-tab-insight-company-people_0",
     menuItemTemplate,
     contentItemTemplate
@@ -1467,7 +1477,8 @@ export async function userFeedCode({
     });
   }
 
-  function insightSearch() {
+  function insightSearch(cb1?: () => void, cb2?: () => void) {
+    cb1 && cb1();
     customTab.tabs.forEach((tab) => {
       tab
         .geFeedFromServer({
@@ -1478,6 +1489,7 @@ export async function userFeedCode({
             tab.setFeedData(res);
             tab.updateFeedContainer(res, userFollowingAndFavourite);
             tab.filterFeed();
+            cb2 && cb2();
           }
         });
     });
