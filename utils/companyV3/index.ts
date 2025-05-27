@@ -16,11 +16,7 @@ export async function companyPageCode({
 }) {
   const pathName = window.location.pathname;
   const route =
-    dataSource === "dev"
-      ? "/dev"
-      : pathName.includes("devprod")
-      ? "/devprod"
-      : "";
+    dataSource === "dev" ? "/dev" : pathName.includes("/demo") ? "/demo" : "";
   const xano_individual_pages = new XanoClient({
     apiGroupBaseUrl: "https://xhka-anc3-3fve.n7c.xano.io/api:CvEH0ZFk",
   }).setDataSource(dataSource);

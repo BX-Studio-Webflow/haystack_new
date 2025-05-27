@@ -1011,11 +1011,7 @@ export async function userFeedCode({
   }
   const pathName = window.location.pathname;
   const route =
-    dataSource === "dev"
-      ? "/dev"
-      : pathName.includes("devprod")
-      ? "/devprod"
-      : "";
+    dataSource === "dev" ? "/dev" : pathName.includes("/demo") ? "/demo" : "";
   const xano_userFeed = new XanoClient({
     apiGroupBaseUrl: "https://xhka-anc3-3fve.n7c.xano.io/api:Hv8ldLVU",
   }).setDataSource(dataSource);
