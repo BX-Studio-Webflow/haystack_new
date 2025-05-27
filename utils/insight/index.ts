@@ -10,8 +10,9 @@ export async function insightPageCode({
 }: {
   dataSource: "live" | "dev";
 }) {
-  const route = dataSource === "dev" ? "/dev" : "";
-  console.log("insight-dev");
+  const pathName = window.location.pathname;
+  const route =
+    dataSource === "dev" ? "/dev" : pathName.includes("/demo") ? "/demo" : "";
   const xano_shared_insight_pages = new XanoClient({
     apiGroupBaseUrl: "https://xhka-anc3-3fve.n7c.xano.io/api:L71qefry",
   }).setDataSource(dataSource);
