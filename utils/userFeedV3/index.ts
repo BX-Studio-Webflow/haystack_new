@@ -1013,8 +1013,8 @@ export async function userFeedCode({
   const route =
     dataSource === "dev"
       ? "/dev"
-      : pathName.includes("dev-prod")
-      ? "/dev-prod"
+      : pathName.includes("devprod")
+      ? "/devprod"
       : "";
   const xano_userFeed = new XanoClient({
     apiGroupBaseUrl: "https://xhka-anc3-3fve.n7c.xano.io/api:Hv8ldLVU",
