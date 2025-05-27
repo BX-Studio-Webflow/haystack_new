@@ -1009,7 +1009,13 @@ export async function userFeedCode({
     //   return this.activeTab ? this.activeTab.items : [];
     // }
   }
-  const route = dataSource === "dev" ? "/dev" : "";
+  const pathName = window.location.pathname;
+  const route =
+    dataSource === "dev"
+      ? "/dev"
+      : pathName.includes("dev-prod")
+      ? "/dev-prod"
+      : "";
   const xano_userFeed = new XanoClient({
     apiGroupBaseUrl: "https://xhka-anc3-3fve.n7c.xano.io/api:Hv8ldLVU",
   }).setDataSource(dataSource);
