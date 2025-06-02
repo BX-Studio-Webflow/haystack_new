@@ -52,6 +52,9 @@ export async function peoplePageCode({
   const personDetails = qsa("[dev-target=person-details]");
 
   const insightSearchInput = qs<HTMLInputElement>("[dev-search-target]");
+  const searchLoadingSpinner = qs<HTMLDivElement>(
+    "[dev-target=search-loading-spinner]"
+  );
   const insightFilterForm = qs<HTMLFormElement>("[dev-target=filter-form]");
   const insightClearFilters = qs<HTMLFormElement>("[dev-target=clear-filters]");
   const inputEvent = new Event("input", { bubbles: true, cancelable: true });
@@ -144,7 +147,15 @@ export async function peoplePageCode({
     });
     insightSearchInput.addEventListener("input", () => {
       searchObject.search = insightSearchInput.value;
-      searchDebounce(personSlug);
+      searchDebounce(
+        personSlug,
+        () => {
+          searchLoadingSpinner.classList.remove("hide");
+        },
+        () => {
+          searchLoadingSpinner.classList.add("hide");
+        }
+      );
     });
     insightClearFilters.addEventListener("click", () => {
       const checkedFilters = qsa<HTMLInputElement>(
@@ -619,10 +630,17 @@ export async function peoplePageCode({
 
   const searchDebounce = debounce(insightSearch, 500);
 
-  function insightSearch(personSlug: string) {
+  function insightSearch(
+    personSlug: string,
+    cb1?: () => void,
+    cb2?: () => void
+  ) {
+    cb1 && cb1();
     getPersonInsights(personSlug, {
       orderBy: sortObject.orderBy,
       sortBy: sortObject.sortBy,
+    }).then((res) => {
+      cb2 && cb2();
     });
   }
 

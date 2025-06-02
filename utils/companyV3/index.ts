@@ -57,6 +57,9 @@ export async function companyPageCode({
   const keyDocumentsCards = qsa(`[dev-target="key-documents-card"]`);
 
   const insightSearchInput = qs<HTMLInputElement>("[dev-search-target]");
+  const searchLoadingSpinner = qs<HTMLDivElement>(
+    "[dev-target=search-loading-spinner]"
+  );
   const insightFilterForm = qs<HTMLFormElement>("[dev-target=filter-form]");
   const insightClearFilters = qs<HTMLFormElement>("[dev-target=clear-filters]");
   const inputEvent = new Event("input", { bubbles: true, cancelable: true });
@@ -151,7 +154,15 @@ export async function companyPageCode({
     });
     insightSearchInput.addEventListener("input", () => {
       searchObject.search = insightSearchInput.value;
-      searchDebounce(companySlug);
+      searchDebounce(
+        companySlug,
+        () => {
+          searchLoadingSpinner.classList.remove("hide");
+        },
+        () => {
+          searchLoadingSpinner.classList.add("hide");
+        }
+      );
     });
     insightClearFilters.addEventListener("click", () => {
       const checkedFilters = qsa<HTMLInputElement>(
@@ -236,10 +247,17 @@ export async function companyPageCode({
 
   const searchDebounce = debounce(insightSearch, 500);
 
-  function insightSearch(companySlug: string) {
+  function insightSearch(
+    companySlug: string,
+    cb1?: () => void,
+    cb2?: () => void
+  ) {
+    cb1 && cb1();
     getCompanyInsights(companySlug, {
       orderBy: sortObject.orderBy,
       sortBy: sortObject.sortBy,
+    }).then((res) => {
+      cb2 && cb2();
     });
   }
 
