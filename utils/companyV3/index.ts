@@ -491,6 +491,10 @@ export async function companyPageCode({
               ?.appendChild(relatedBusinessItem);
             window.Webflow.require("ix2").init();
           });
+        } else {
+          relatedBusinessCard
+            .querySelector(`[dev-target=related-business-empty-state]`)
+            ?.classList.remove("hide");
         }
       });
 
