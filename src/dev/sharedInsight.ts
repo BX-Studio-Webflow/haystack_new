@@ -1,5 +1,5 @@
-import { sharedInsightPageCode } from "../../utils/sharedInsight";
+import { sharedInsightPageCode } from '../../utils/sharedInsight';
 
-document.addEventListener("DOMContentLoaded", async () => {
-  sharedInsightPageCode({ dataSource: "dev" });
+document.addEventListener('DOMContentLoaded', async () => {
+  sharedInsightPageCode({ dataSource: 'dev' });
 });

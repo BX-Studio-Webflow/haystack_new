@@ -1,5 +1,5 @@
-import { insightPageCode } from "../../utils/insight";
+import { insightPageCode } from '../../utils/insight';
 
-document.addEventListener("DOMContentLoaded", async () => {
-  insightPageCode({ dataSource: "live" });
+document.addEventListener('DOMContentLoaded', async () => {
+  insightPageCode({ dataSource: 'live' });
 });

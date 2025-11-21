@@ -104,8 +104,8 @@
 //   mode: "production", // or 'development' based on your needs
 // };
 
-const path = require("path");
-const fs = require("fs");
+const path = require('path');
+const fs = require('fs');
 
 // Recursive function to get all TypeScript files in a directory
 const getFilesRecursively = (dir, fileList = []) => {
@@ -115,7 +115,7 @@ const getFilesRecursively = (dir, fileList = []) => {
     const filePath = path.join(dir, file);
     if (fs.statSync(filePath).isDirectory()) {
       getFilesRecursively(filePath, fileList);
-    } else if (file.endsWith(".ts")) {
+    } else if (file.endsWith('.ts')) {
       fileList.push(filePath);
     }
   });
@@ -125,13 +125,13 @@ const getFilesRecursively = (dir, fileList = []) => {
 
 // Function to generate entry points from TypeScript files
 const getEntryPoints = () => {
-  const srcDir = path.resolve(__dirname, "src");
+  const srcDir = path.resolve(__dirname, 'src');
   const tsFiles = getFilesRecursively(srcDir);
 
   const entry = {};
   tsFiles.forEach((file) => {
     const relativePath = path.relative(srcDir, file);
-    const name = path.relative(srcDir, file).replace(/\.ts$/, "");
+    const name = path.relative(srcDir, file).replace(/\.ts$/, '');
     const entryPath = path.resolve(srcDir, relativePath);
     entry[name] = entryPath;
   });
@@ -142,28 +142,28 @@ const getEntryPoints = () => {
 module.exports = {
   entry: getEntryPoints(),
   output: {
-    path: path.resolve(__dirname, "dist"),
-    filename: "[name].js",
+    path: path.resolve(__dirname, 'dist'),
+    filename: '[name].js',
     // Preserve directory structure by using [name].js
     // which will use the key name from the entry object
-    libraryTarget: "umd",
-    library: "[name]",
+    libraryTarget: 'umd',
+    library: '[name]',
   },
   module: {
     rules: [
       {
         test: /\.ts$/,
-        use: "ts-loader",
+        use: 'ts-loader',
         exclude: /node_modules/,
       },
     ],
   },
   resolve: {
-    extensions: [".ts", ".js"],
+    extensions: ['.ts', '.js'],
   },
   optimization: {
     splitChunks: false, // Disable code splitting
     // minimize: false,
   },
-  mode: "production", // or 'development' based on your needs
+  mode: 'production', // or 'development' based on your needs
 };

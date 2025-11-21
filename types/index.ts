@@ -38,34 +38,18 @@ export interface Insight {
     slug: string;
     company_id: number | null;
     description: string;
-    "insight-detail": string;
+    'insight-detail': string;
     curated: Date | null;
     source_author: string;
     source: string;
-    "source-url": string;
-    "source-publication-date": Date | null;
-    source_category_id: (
-      | { id: number; name: string; slug: string }
-      | null
-      | 0
-    )[];
+    'source-url': string;
+    'source-publication-date': Date | null;
+    source_category_id: ({ id: number; name: string; slug: string } | null | 0)[];
     company_type_id: ({ id: number; name: string; slug: string } | null | 0)[];
-    insight_classification_id: (
-      | { id: number; name: string; slug: string }
-      | null
-      | 0
-    )[];
-    line_of_business_id: (
-      | { id: number; name: string; slug: string }
-      | null
-      | 0
-    )[];
-    technology_category_id: (
-      | { id: number; name: string; slug: string }
-      | null
-      | 0
-    )[];
-    "companies-mentioned": number[];
+    insight_classification_id: ({ id: number; name: string; slug: string } | null | 0)[];
+    line_of_business_id: ({ id: number; name: string; slug: string } | null | 0)[];
+    technology_category_id: ({ id: number; name: string; slug: string } | null | 0)[];
+    'companies-mentioned': number[];
     companies_mentioned: number[];
     people_id: number[];
     event_id: number;
@@ -73,7 +57,7 @@ export interface Insight {
       id: number;
       name: string;
       slug: string;
-      "company-website": string;
+      'company-website': string;
       company_logo: null | { url: string };
     };
     published: boolean;
@@ -176,12 +160,12 @@ export interface PersonInsightResponse {
     slug: string;
     company_id: number;
     description: string;
-    "insight-detail": string;
+    'insight-detail': string;
     curated: Date;
     source_author: string;
     source: string;
-    "source-url": string;
-    "source-publication-date": Date;
+    'source-url': string;
+    'source-publication-date': Date;
     source_category_id: any[];
     company_type_id: {
       id: number;
@@ -199,7 +183,7 @@ export interface PersonInsightResponse {
       name: string;
       slug: string;
     }[];
-    "companies-mentioned": any[];
+    'companies-mentioned': any[];
     people_id: number[];
     event_id: number;
     published: boolean;
@@ -207,7 +191,7 @@ export interface PersonInsightResponse {
       id: number;
       name: string;
       slug: string;
-      "company-website": string;
+      'company-website': string;
       company_logo: null | { url: string };
     };
   }[];
@@ -220,12 +204,12 @@ export interface InsightResponse {
   slug: string;
   company_id: number;
   description: string;
-  "insight-detail": string;
+  'insight-detail': string;
   curated: Date;
   source_author: string;
   source: string;
-  "source-url": string;
-  "source-publication-date": Date;
+  'source-url': string;
+  'source-publication-date': Date;
   source_category_id: {
     id: number;
     name: string;
@@ -251,18 +235,18 @@ export interface InsightResponse {
     name: string;
     slug: string;
   }[];
-  "companies-mentioned": {
+  'companies-mentioned': {
     id: number;
     name: string;
     slug: string;
-    "company-website": string;
+    'company-website': string;
     company_logo: null | { url: string };
   }[];
   companies_mentioned: ({
     id: number;
     name: string;
     slug: string;
-    "company-website": string;
+    'company-website': string;
     company_logo: null | { url: string };
   } | null)[];
   people_id: ({
@@ -290,7 +274,7 @@ export interface InsightResponse {
     id: number;
     name: string;
     slug: string;
-    "company-website": string;
+    'company-website': string;
     company_logo: null | { url: string };
   };
   event_details: {
@@ -305,27 +289,27 @@ export interface Company {
   created_at: number;
   name: string;
   slug: string;
-  "company-linkedin-profile-link": string;
-  "company-website": string;
+  'company-linkedin-profile-link': string;
+  'company-website': string;
   location: string;
-  "company-size": string;
+  'company-size': string;
   business_entity_id: number;
   business_entity_details: { id: number; name: string; slug: string } | null;
   company_type_id: number;
   company_type_details: { id: number; name: string; slug: string } | null;
-  "company-revenue": string;
-  "fiscal-year": string;
-  "description-small": string;
+  'company-revenue': string;
+  'fiscal-year': string;
+  'description-small': string;
   about: string;
   people_id: ({ id: number; name: string; slug: string } | null)[];
   event_id: { id: number; name: string; slug: string };
   state_local_regulator_id: [];
-  "related-business-entities":
+  'related-business-entities':
     | ({
         id: number;
         name: string;
         slug: string;
-        "description-small": string;
+        'description-small': string;
       } | null)[]
     | null;
   key_documents: ({
@@ -342,10 +326,10 @@ export interface CompanyV2 {
   created_at: number;
   name: string;
   slug: string;
-  "company-linkedin-profile-link": string;
-  "company-website": string;
+  'company-linkedin-profile-link': string;
+  'company-website': string;
   company_type_id: number;
-  "description-small": string;
+  'description-small': string;
   company_logo: null | { url: string };
   published: boolean;
 }
@@ -356,30 +340,18 @@ export interface InsightV2 {
   slug: string;
   company_id: number | null;
   description: string;
-  "insight-detail": string;
+  'insight-detail': string;
   curated: Date | null;
   source_author: string;
   source: string;
-  "source-url": string;
-  "source-publication-date": Date | null;
+  'source-url': string;
+  'source-publication-date': Date | null;
   source_category_id: ({ id: number; name: string; slug: string } | null | 0)[];
   company_type_id: ({ id: number; name: string; slug: string } | null | 0)[];
-  insight_classification_id: (
-    | { id: number; name: string; slug: string }
-    | null
-    | 0
-  )[];
-  line_of_business_id: (
-    | { id: number; name: string; slug: string }
-    | null
-    | 0
-  )[];
-  technology_category_id: (
-    | { id: number; name: string; slug: string }
-    | null
-    | 0
-  )[];
-  "companies-mentioned": number[];
+  insight_classification_id: ({ id: number; name: string; slug: string } | null | 0)[];
+  line_of_business_id: ({ id: number; name: string; slug: string } | null | 0)[];
+  technology_category_id: ({ id: number; name: string; slug: string } | null | 0)[];
+  'companies-mentioned': number[];
   companies_mentioned: number[];
   people_id: number[];
   event_id: number;
@@ -387,7 +359,7 @@ export interface InsightV2 {
     id: number;
     name: string;
     slug: string;
-    "company-website": string;
+    'company-website': string;
     company_logo: null | { url: string };
   };
   published: boolean;
@@ -425,15 +397,15 @@ export type UserFeedResponse = {
   offset: number;
   itemsTotal: number;
 } & (
-  | { items: InsightV2[]; type: "insight" }
-  | { items: CompanyV2[]; type: "company" }
-  | { items: PersonV2[]; type: "people" }
+  | { items: InsightV2[]; type: 'insight' }
+  | { items: CompanyV2[]; type: 'company' }
+  | { items: PersonV2[]; type: 'people' }
 );
 
-export type SortOrder = "asc" | "desc" | "random";
-export type InsightItem = InsightV2 & { type: "insight" };
-export type CompanyItem = CompanyV2 & { type: "company" };
-export type PersonItem = PersonV2 & { type: "people" };
+export type SortOrder = 'asc' | 'desc' | 'random';
+export type InsightItem = InsightV2 & { type: 'insight' };
+export type CompanyItem = CompanyV2 & { type: 'company' };
+export type PersonItem = PersonV2 & { type: 'people' };
 export type MergedItem = InsightItem | CompanyItem | PersonItem;
 
 export type MergedResult = {

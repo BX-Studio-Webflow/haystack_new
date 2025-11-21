@@ -1,5 +1,5 @@
-import { searchCode } from "../../utils/globalSearch";
+import { searchCode } from '../../utils/globalSearch';
 
-document.addEventListener("DOMContentLoaded", async () => {
-  searchCode({ dataSource: "dev" });
+document.addEventListener('DOMContentLoaded', async () => {
+  searchCode({ dataSource: 'dev' });
 });

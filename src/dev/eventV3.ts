@@ -1,5 +1,5 @@
-import { eventPageCode } from "../../utils/eventV3";
+import { eventPageCode } from '../../utils/eventV3';
 
-document.addEventListener("DOMContentLoaded", async () => {
-  eventPageCode({ dataSource: "dev" });
+document.addEventListener('DOMContentLoaded', async () => {
+  eventPageCode({ dataSource: 'dev' });
 });

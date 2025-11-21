@@ -1,5 +1,5 @@
-import { userFeedCode } from "../../utils/userFeedV3";
+import { userFeedCode } from '../../utils/userFeedV3';
 
-document.addEventListener("DOMContentLoaded", () => {
-  userFeedCode({ dataSource: "dev" });
+document.addEventListener('DOMContentLoaded', () => {
+  userFeedCode({ dataSource: 'dev' });
 });

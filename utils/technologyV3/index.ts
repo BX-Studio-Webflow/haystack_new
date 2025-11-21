@@ -1,33 +1,28 @@
-import { XanoClient } from "@xano/js-sdk";
+import { XanoClient } from '@xano/js-sdk';
 import {
   FilterResponse,
   InsightPayload,
   PersonInsightResponse,
   SearchObject,
   UserFollowingAndFavourite,
-} from "../../types";
-import { debounce, formatCuratedDate, qs, qsa } from "..";
+} from '../../types';
+import { debounce, formatCuratedDate, qs, qsa } from '..';
 
-export async function techPageCode({
-  dataSource,
-}: {
-  dataSource: "live" | "dev";
-}) {
+export async function techPageCode({ dataSource }: { dataSource: 'live' | 'dev' }) {
   const pathName = window.location.pathname;
-  const route =
-    dataSource === "dev" ? "/dev" : pathName.includes("/demo") ? "/demo" : "";
+  const route = dataSource === 'dev' ? '/dev' : pathName.includes('/demo') ? '/demo' : '';
   const xano_individual_pages = new XanoClient({
-    apiGroupBaseUrl: "https://xhka-anc3-3fve.n7c.xano.io/api:CvEH0ZFk",
+    apiGroupBaseUrl: 'https://xhka-anc3-3fve.n7c.xano.io/api:CvEH0ZFk',
   }).setDataSource(dataSource);
   const xano_wmx = new XanoClient({
-    apiGroupBaseUrl: "https://xhka-anc3-3fve.n7c.xano.io/api:6Ie7e140",
+    apiGroupBaseUrl: 'https://xhka-anc3-3fve.n7c.xano.io/api:6Ie7e140',
   }).setDataSource(dataSource);
   const xano_userFeed = new XanoClient({
-    apiGroupBaseUrl: "https://xhka-anc3-3fve.n7c.xano.io/api:Hv8ldLVU",
+    apiGroupBaseUrl: 'https://xhka-anc3-3fve.n7c.xano.io/api:Hv8ldLVU',
   }).setDataSource(dataSource);
 
   const searchObject: SearchObject = {
-    search: "",
+    search: '',
     checkboxes: {
       companyType: [],
       sourceCat: [],
@@ -38,28 +33,26 @@ export async function techPageCode({
     },
   };
   const sortObject = {
-    sortBy: "created_at",
-    orderBy: "desc",
+    sortBy: 'created_at',
+    orderBy: 'desc',
   };
 
   const searchParams = new URLSearchParams(window.location.search);
-  const technologySlug = searchParams.get("name");
+  const technologySlug = searchParams.get('name');
 
   let userFollowingAndFavourite: UserFollowingAndFavourite | null = null;
   let xanoToken: string | null = null;
 
-  const techCatCards = qsa("[dev-target=tech-cat-card]");
-  const cardSkeletons = qsa("[dev-target=card-skeleton]");
-  const insightsSkeleton = qs("[dev-target=skeleton-insights]");
-  const eventDetails = qsa("[dev-event-details]");
+  const techCatCards = qsa('[dev-target=tech-cat-card]');
+  const cardSkeletons = qsa('[dev-target=card-skeleton]');
+  const insightsSkeleton = qs('[dev-target=skeleton-insights]');
+  const eventDetails = qsa('[dev-event-details]');
 
-  const insightSearchInput = qs<HTMLInputElement>("[dev-search-target]");
-  const searchLoadingSpinner = qs<HTMLDivElement>(
-    "[dev-target=search-loading-spinner]"
-  );
-  const insightFilterForm = qs<HTMLFormElement>("[dev-target=filter-form]");
-  const insightClearFilters = qs<HTMLFormElement>("[dev-target=clear-filters]");
-  const inputEvent = new Event("input", { bubbles: true, cancelable: true });
+  const insightSearchInput = qs<HTMLInputElement>('[dev-search-target]');
+  const searchLoadingSpinner = qs<HTMLDivElement>('[dev-target=search-loading-spinner]');
+  const insightFilterForm = qs<HTMLFormElement>('[dev-target=filter-form]');
+  const insightClearFilters = qs<HTMLFormElement>('[dev-target=clear-filters]');
+  const inputEvent = new Event('input', { bubbles: true, cancelable: true });
 
   const insightTemplate = qs(`[dev-template="insight-item"]`);
   const insightTagTemplate = qs(`[dev-template="insight-tag"]`);
@@ -75,14 +68,12 @@ export async function techPageCode({
 
   const paginationTemplate = qs(`[dev-target=pagination-wrapper]`);
 
-  const memberStackUserToken = localStorage.getItem("_ms-mid");
+  const memberStackUserToken = localStorage.getItem('_ms-mid');
   if (!memberStackUserToken) {
-    return console.error("No memberstack token");
+    return console.error('No memberstack token');
   }
 
-  const lsUserFollowingFavourite = localStorage.getItem(
-    "user-following-favourite"
-  );
+  const lsUserFollowingFavourite = localStorage.getItem('user-following-favourite');
   // const lsXanoAuthToken = localStorage.getItem("AuthToken");
   // if (lsXanoAuthToken) {
   //   xanoToken = lsXanoAuthToken;
@@ -92,7 +83,7 @@ export async function techPageCode({
   }
 
   if (!technologySlug) {
-    return console.error("add event name in the url eg /technology/analytics");
+    return console.error('add event name in the url eg /technology/analytics');
   }
 
   if (xanoToken) {
@@ -102,14 +93,12 @@ export async function techPageCode({
   } else {
     await getXanoAccessToken(memberStackUserToken);
   }
-  lsUserFollowingFavourite
-    ? getUserFollowingAndFavourite()
-    : await getUserFollowingAndFavourite();
+  lsUserFollowingFavourite ? getUserFollowingAndFavourite() : await getUserFollowingAndFavourite();
   technologyCatPageInit(technologySlug);
 
   async function getXanoAccessToken(memberstackToken: string) {
     try {
-      const res = await xano_wmx.post("/auth-user", {
+      const res = await xano_wmx.post('/auth-user', {
         memberstack_token: memberstackToken,
       });
       const xanoAuthToken = res.getBody().authToken as string;
@@ -117,21 +106,18 @@ export async function techPageCode({
       xano_individual_pages.setAuthToken(xanoAuthToken);
       return xanoAuthToken;
     } catch (error) {
-      console.log("getXanoAccessToken_error", error);
+      console.log('getXanoAccessToken_error', error);
       return null;
     }
   }
 
   async function getUserFollowingAndFavourite() {
     try {
-      const res = await xano_userFeed.get("/user-following-and-favourite");
+      const res = await xano_userFeed.get('/user-following-and-favourite');
       const followingAndFavourite = res.getBody() as UserFollowingAndFavourite;
       // const { user_following } = followingAndFavourite;
       userFollowingAndFavourite = followingAndFavourite;
-      localStorage.setItem(
-        "user-following-favourite",
-        JSON.stringify(followingAndFavourite)
-      );
+      localStorage.setItem('user-following-favourite', JSON.stringify(followingAndFavourite));
 
       return followingAndFavourite;
     } catch (error) {
@@ -143,54 +129,34 @@ export async function techPageCode({
   async function technologyCatPageInit(technologySlug: string) {
     getTechnologyCatInsights(technologySlug, {});
     getTechnologyCat(technologySlug);
-    insightFilterForm.addEventListener("submit", (e) => {
+    insightFilterForm.addEventListener('submit', (e) => {
       e.preventDefault();
       e.stopPropagation();
     });
-    insightSearchInput.addEventListener("input", () => {
+    insightSearchInput.addEventListener('input', () => {
       searchObject.search = insightSearchInput.value;
       searchDebounce(
         technologySlug,
         () => {
-          searchLoadingSpinner.classList.remove("hide");
+          searchLoadingSpinner.classList.remove('hide');
         },
         () => {
-          searchLoadingSpinner.classList.add("hide");
-        }
+          searchLoadingSpinner.classList.add('hide');
+        },
       );
     });
-    insightClearFilters.addEventListener("click", () => {
-      const checkedFilters = qsa<HTMLInputElement>(
-        "[dev-input-checkbox]:checked"
-      );
+    insightClearFilters.addEventListener('click', () => {
+      const checkedFilters = qsa<HTMLInputElement>('[dev-input-checkbox]:checked');
 
-      insightSearchInput.value = "";
+      insightSearchInput.value = '';
       insightSearchInput.dispatchEvent(inputEvent);
       checkedFilters.forEach((input) => {
         input.click();
       });
     });
-    getFilters(
-      "/company_type",
-      {},
-      "companyType",
-      filterCompanyTypeTarget,
-      technologySlug
-    );
-    getFilters(
-      "/source_category",
-      {},
-      "sourceCat",
-      filterSourceCatTarget,
-      technologySlug
-    );
-    getFilters(
-      "/technology_category",
-      {},
-      "techCat",
-      filterTechCatTarget,
-      technologySlug
-    );
+    getFilters('/company_type', {}, 'companyType', filterCompanyTypeTarget, technologySlug);
+    getFilters('/source_category', {}, 'sourceCat', filterSourceCatTarget, technologySlug);
+    getFilters('/technology_category', {}, 'techCat', filterTechCatTarget, technologySlug);
     // getFilters(
     //   "/line_of_business",
     //   {},
@@ -199,90 +165,69 @@ export async function techPageCode({
     //   technologySlug
     // );
     getFilters(
-      "/insight_classification",
+      '/insight_classification',
       {},
-      "insightClass",
+      'insightClass',
       filterInsightClassTarget,
-      technologySlug
+      technologySlug,
     );
     sortLogicInit(technologySlug);
   }
 
-  async function getTechnologyCatInsights(
-    slug: string,
-    payload: InsightPayload
-  ) {
+  async function getTechnologyCatInsights(slug: string, payload: InsightPayload) {
     const { page = 0, perPage = 0, offset = 0 } = payload;
     try {
-      const res = await xano_individual_pages.get(
-        "/technology_category_insights",
-        {
-          slug,
-          page,
-          perPage,
-          offset,
-          sortBy: sortObject.sortBy,
-          orderBy: sortObject.orderBy,
-          filtering: searchObject,
-        }
-      );
+      const res = await xano_individual_pages.get('/technology_category_insights', {
+        slug,
+        page,
+        perPage,
+        offset,
+        sortBy: sortObject.sortBy,
+        orderBy: sortObject.orderBy,
+        filtering: searchObject,
+      });
       const eventInsightResponse = res.getBody() as PersonInsightResponse;
-      allTabsTarget.innerHTML = "";
+      allTabsTarget.innerHTML = '';
 
       paginationLogic(eventInsightResponse, slug);
 
       userFollowingAndFavourite &&
-        initInsights(
-          eventInsightResponse,
-          allTabsTarget,
-          userFollowingAndFavourite
-        );
+        initInsights(eventInsightResponse, allTabsTarget, userFollowingAndFavourite);
       insightsSkeleton.remove();
-      console.log("eventInsightResponse", eventInsightResponse);
+      console.log('eventInsightResponse', eventInsightResponse);
       return eventInsightResponse;
     } catch (error) {
-      console.log("getTechnologyCatInsights_error", error);
+      console.log('getTechnologyCatInsights_error', error);
       return null;
     }
   }
 
-  function paginationLogic(
-    insight: PersonInsightResponse,
-    technologySlug: string
-  ) {
+  function paginationLogic(insight: PersonInsightResponse, technologySlug: string) {
     const paginationTarget = qs(`[dev-target="all-tab-pagination_wrapper"]`);
 
     const { curPage, nextPage, prevPage, itemsReceived } = insight;
-    const paginationWrapper = paginationTarget.closest(
-      `[dev-target="insight-pagination-wrapper"]`
-    );
+    const paginationWrapper = paginationTarget.closest(`[dev-target="insight-pagination-wrapper"]`);
     const pagination = paginationTemplate.cloneNode(true) as HTMLDivElement;
     const prevBtn = pagination.querySelector(
-      `[dev-target=pagination-previous]`
+      `[dev-target=pagination-previous]`,
     ) as HTMLButtonElement;
-    const nextBtn = pagination.querySelector(
-      `[dev-target=pagination-next]`
-    ) as HTMLButtonElement;
+    const nextBtn = pagination.querySelector(`[dev-target=pagination-next]`) as HTMLButtonElement;
     const pageItemWrapper = pagination.querySelector(
-      `[dev-target=pagination-number-wrapper]`
+      `[dev-target=pagination-number-wrapper]`,
     ) as HTMLDivElement;
     // const pageItem = pagination
     //   .querySelector(`[dev-target=page-number-temp]`)
     //   ?.cloneNode(true) as HTMLButtonElement;
 
-    paginationTarget.innerHTML = "";
-    pageItemWrapper.innerHTML = "";
+    paginationTarget.innerHTML = '';
+    pageItemWrapper.innerHTML = '';
 
     if (itemsReceived === 0) {
-      paginationTarget?.classList.add("hide");
-      paginationWrapper
-        ?.querySelector(`[dev-tab-empty-state]`)
-        ?.classList.remove("hide");
+      paginationTarget?.classList.add('hide');
+      paginationWrapper?.querySelector(`[dev-tab-empty-state]`)?.classList.remove('hide');
     } else {
-      paginationTarget?.classList.remove("hide");
-      paginationWrapper
-        ?.querySelector(`[dev-tab-empty-state]`)
-        ?.classList.add("hide");
+      paginationTarget?.classList.remove('hide');
+      paginationWrapper?.querySelector(`[dev-tab-empty-state]`)?.classList.add('hide');
     }
 
     // if (pageTotal <= 6) {
@@ -376,30 +321,30 @@ export async function techPageCode({
     //   pageItemWrapper.appendChild(pageNumItem);
     // }
 
-    prevBtn.classList[prevPage ? "remove" : "add"]("disabled");
-    nextBtn.classList[nextPage ? "remove" : "add"]("disabled");
+    prevBtn.classList[prevPage ? 'remove' : 'add']('disabled');
+    nextBtn.classList[nextPage ? 'remove' : 'add']('disabled');
 
     nextPage &&
-      nextBtn.addEventListener("click", () => {
+      nextBtn.addEventListener('click', () => {
         paginationWrapper?.scrollTo({
           top: 0,
-          behavior: "smooth",
+          behavior: 'smooth',
         });
         window.scrollTo({
           top: 0,
-          behavior: "smooth",
+          behavior: 'smooth',
         });
         getTechnologyCatInsights(technologySlug, { page: curPage + 1 });
       });
     prevPage &&
-      prevBtn.addEventListener("click", () => {
+      prevBtn.addEventListener('click', () => {
         paginationWrapper?.scrollTo({
           top: 0,
-          behavior: "smooth",
+          behavior: 'smooth',
         });
         window.scrollTo({
           top: 0,
-          behavior: "smooth",
+          behavior: 'smooth',
         });
         getTechnologyCatInsights(technologySlug, { page: curPage - 1 });
         // getInsights(endPoint, { page: curPage - 1 }, tagTarget);
@@ -407,7 +352,7 @@ export async function techPageCode({
     // pagination.style.display = pageTotal === 1 ? "none" : "flex";
 
     if (nextPage === null && prevPage === null) {
-      paginationTarget?.classList.add("hide");
+      paginationTarget?.classList.add('hide');
     }
     paginationTarget.appendChild(pagination);
   }
@@ -415,139 +360,110 @@ export async function techPageCode({
   function initInsights(
     insights: PersonInsightResponse,
     target: HTMLDivElement,
-    userFollowingAndFavourite: UserFollowingAndFavourite
+    userFollowingAndFavourite: UserFollowingAndFavourite,
   ) {
     insights.items.forEach((insight) => {
       const newInsight = insightTemplate.cloneNode(true) as HTMLDivElement;
 
       const insightDateWrap = newInsight.querySelector<HTMLDivElement>(
-        `[dev-target=insight-date-wrap]`
+        `[dev-target=insight-date-wrap]`,
       );
-      const searchTextDiv = newInsight.querySelector<HTMLDivElement>(
-        `[dev-target=search-text]`
-      );
+      const searchTextDiv = newInsight.querySelector<HTMLDivElement>(`[dev-target=search-text]`);
       const searchListWrap = newInsight.querySelector<HTMLDivElement>(
-        `[dev-target=search-list-wrap]`
+        `[dev-target=search-list-wrap]`,
       );
-      const searchCount = searchListWrap!.querySelector<HTMLDivElement>(
-        `[dev-target=search-count]`
-      );
+      const searchCount =
+        searchListWrap!.querySelector<HTMLDivElement>(`[dev-target=search-count]`);
       const searchResultList = searchListWrap!.querySelector<HTMLDivElement>(
-        `[dev-target=search-result-list]`
+        `[dev-target=search-result-list]`,
       );
-      const searchResultListWrapper =
-        searchListWrap!.querySelector<HTMLDivElement>(
-          `[dev-target="search-result-list-wrapper"]`
-        );
+      const searchResultListWrapper = searchListWrap!.querySelector<HTMLDivElement>(
+        `[dev-target="search-result-list-wrapper"]`,
+      );
       const searchResultItem = searchListWrap!.querySelector<HTMLDivElement>(
-        `[dev-template=search-result-item]`
+        `[dev-template=search-result-item]`,
       );
 
       const tagsWrapperTarget = newInsight.querySelector<HTMLDivElement>(
-        `[dev-target=tags-container]`
+        `[dev-target=tags-container]`,
       );
 
       const companyLink = newInsight.querySelector(`[dev-target=company-link]`);
-      const companyImage = newInsight.querySelector<HTMLImageElement>(
-        `[dev-target=company-image]`
-      );
-      const insightNameTarget = newInsight.querySelector(
-        `[dev-target=insight-name]`
-      );
+      const companyImage = newInsight.querySelector<HTMLImageElement>(`[dev-target=company-image]`);
+      const insightNameTarget = newInsight.querySelector(`[dev-target=insight-name]`);
       const insightLink = newInsight.querySelector(`[dev-target=insight-link]`);
       const curatedDateTargetWrapper = newInsight.querySelector(
-        `[dev-target="curated-date-wrapper"]`
+        `[dev-target="curated-date-wrapper"]`,
       );
-      const curatedDateTarget = newInsight.querySelector(
-        `[dev-target="curated-date"]`
-      );
+      const curatedDateTarget = newInsight.querySelector(`[dev-target="curated-date"]`);
       const publishedDateTargetWrapper = newInsight.querySelectorAll(
-        `[dev-target="published-date-wrapper"]`
+        `[dev-target="published-date-wrapper"]`,
       );
-      const publishedDateTarget = newInsight.querySelector(
-        `[dev-target="published-date"]`
-      );
+      const publishedDateTarget = newInsight.querySelector(`[dev-target="published-date"]`);
       const sourceTargetWrapper = newInsight.querySelector(
-        `[dev-target="source-name-link-wrapper"]`
+        `[dev-target="source-name-link-wrapper"]`,
       );
-      const sourceTarget = newInsight.querySelector(
-        `[dev-target="source-name-link"]`
-      );
+      const sourceTarget = newInsight.querySelector(`[dev-target="source-name-link"]`);
       const sourceAuthorTargetWrapper = newInsight.querySelectorAll(
-        `[dev-target="source-author-wrapper"]`
+        `[dev-target="source-author-wrapper"]`,
       );
-      const sourceAuthorTarget = newInsight.querySelector(
-        `[dev-target="source-author"]`
-      );
+      const sourceAuthorTarget = newInsight.querySelector(`[dev-target="source-author"]`);
 
-      const curatedDate = insight.curated
-        ? formatCuratedDate(insight.curated)
-        : "";
-      const publishedDate = insight["source-publication-date"]
-        ? formatPublishedDate(insight["source-publication-date"])
-        : "";
+      const curatedDate = insight.curated ? formatCuratedDate(insight.curated) : '';
+      const publishedDate = insight['source-publication-date']
+        ? formatPublishedDate(insight['source-publication-date'])
+        : '';
       const sourceCatArray = insight.source_category_id;
       const companyTypeArray = insight.company_type_id;
       const insightClassArray = insight.insight_classification_id;
       // const lineOfBusArray = insight.line_of_business_id;
       const techCatArray = insight.technology_category_id;
 
-      if (insightDateWrap) insightDateWrap.style.display = "flex";
-      if (searchTextDiv) searchTextDiv.style.display = "none";
-      if (searchListWrap) searchListWrap.style.display = "none";
+      if (insightDateWrap) insightDateWrap.style.display = 'flex';
+      if (searchTextDiv) searchTextDiv.style.display = 'none';
+      if (searchListWrap) searchListWrap.style.display = 'none';
 
       const searchList = getHighlightedSentences(
-        insight["insight-detail"] ?? "",
+        insight['insight-detail'] ?? '',
         searchObject.search,
         5,
         30,
-        true
+        true,
       );
-      searchResultList!.innerHTML = "";
+      searchResultList!.innerHTML = '';
       searchCount!.textContent = `${searchList.length}`;
       if (searchList.length > 0) {
-        if (searchListWrap) searchListWrap.style.display = "flex";
+        if (searchListWrap) searchListWrap.style.display = 'flex';
         searchList.forEach((item) => {
-          const newSearchResultItem = searchResultItem!.cloneNode(
-            true
-          ) as HTMLDivElement;
+          const newSearchResultItem = searchResultItem!.cloneNode(true) as HTMLDivElement;
           const searchResultCount = newSearchResultItem.querySelector(
-            "[dev-template-number]"
+            '[dev-template-number]',
           ) as HTMLDivElement;
           const searchResultText = newSearchResultItem.querySelector(
-            "[dev-template-text]"
+            '[dev-template-text]',
           ) as HTMLDivElement;
           searchResultCount!.textContent = `${searchList.indexOf(item) + 1}`;
-          searchResultText.innerHTML = highlightQueryInText(
-            item,
-            searchObject.search
-          );
-          searchResultText.setAttribute(
-            "href",
-            `${route}/insight/${insight.slug}`
-          );
-          searchResultText.setAttribute("target", "_blank");
+          searchResultText.innerHTML = highlightQueryInText(item, searchObject.search);
+          searchResultText.setAttribute('href', `${route}/insight/${insight.slug}`);
+          searchResultText.setAttribute('target', '_blank');
           searchResultList!.appendChild(newSearchResultItem);
         });
       }
-      if (searchResultListWrapper) searchResultListWrapper.style.height = "0px";
+      if (searchResultListWrapper) searchResultListWrapper.style.height = '0px';
       if (searchListWrap) searchAccordionLogic(searchListWrap);
 
       const companyInputs = newInsight.querySelectorAll<HTMLInputElement>(
-        `[dev-target=company-input]`
+        `[dev-target=company-input]`,
       );
       companyInputs.forEach((companyInput) => {
         fakeCheckboxToggle(companyInput!);
-        companyInput?.setAttribute("dev-input-type", "company_id");
+        companyInput?.setAttribute('dev-input-type', 'company_id');
         if (insight.company_id) {
-          companyInput?.setAttribute(
-            "dev-input-id",
-            insight.company_id.toString()
-          );
+          companyInput?.setAttribute('dev-input-id', insight.company_id.toString());
         } else {
-          const inputForm = companyInput.closest("form");
+          const inputForm = companyInput.closest('form');
           if (inputForm) {
-            inputForm.style.display = "none";
+            inputForm.style.display = 'none';
           }
         }
         // companyInput?.setAttribute(
@@ -558,101 +474,67 @@ export async function techPageCode({
         companyInput &&
           setCheckboxesInitialState(
             companyInput,
-            convertArrayOfObjToNumber(
-              userFollowingAndFavourite.user_following.company_id
-            )
+            convertArrayOfObjToNumber(userFollowingAndFavourite.user_following.company_id),
           );
       });
       const favouriteInputs = newInsight.querySelectorAll<HTMLInputElement>(
-        `[dev-target=favourite-input]`
+        `[dev-target=favourite-input]`,
       );
       favouriteInputs.forEach((favouriteInput) => {
         fakeCheckboxToggle(favouriteInput!);
 
-        favouriteInput?.setAttribute("dev-input-type", "favourite");
-        favouriteInput?.setAttribute("dev-input-id", insight.id.toString());
+        favouriteInput?.setAttribute('dev-input-type', 'favourite');
+        favouriteInput?.setAttribute('dev-input-id', insight.id.toString());
 
         favouriteInput && followFavouriteLogic(favouriteInput);
 
         favouriteInput &&
           setCheckboxesInitialState(
             favouriteInput,
-            userFollowingAndFavourite.user_favourite.insight_id
+            userFollowingAndFavourite.user_favourite.insight_id,
           );
       });
 
-      addTagsToInsight(
-        searchObject.search,
-        sourceCatArray,
-        tagsWrapperTarget!,
-        false
-      );
-      addTagsToInsight(
-        searchObject.search,
-        companyTypeArray,
-        tagsWrapperTarget!,
-        false
-      );
-      addTagsToInsight(
-        searchObject.search,
-        insightClassArray,
-        tagsWrapperTarget!,
-        false
-      );
+      addTagsToInsight(searchObject.search, sourceCatArray, tagsWrapperTarget!, false);
+      addTagsToInsight(searchObject.search, companyTypeArray, tagsWrapperTarget!, false);
+      addTagsToInsight(searchObject.search, insightClassArray, tagsWrapperTarget!, false);
       // addTagsToInsight(lineOfBusArray, tagsWrapperTarget!, false);
       addTagsToInsight(
         searchObject.search,
         techCatArray,
         tagsWrapperTarget!,
         true,
-        "technology_category_id"
+        'technology_category_id',
       );
 
       if (insight.company_details && insight.company_details.company_logo) {
         companyImage!.src = insight.company_details.company_logo.url;
-      } else if (
-        insight.company_details &&
-        insight.company_details["company-website"]
-      ) {
+      } else if (insight.company_details && insight.company_details['company-website']) {
         companyImage!.src =
-          "https://logo.clearbit.com/" +
-          insight.company_details["company-website"];
-        fetch(
-          "https://logo.clearbit.com/" +
-            insight.company_details["company-website"]
-        ).catch(
+          'https://logo.clearbit.com/' + insight.company_details['company-website'];
+        fetch('https://logo.clearbit.com/' + insight.company_details['company-website']).catch(
           () =>
             (companyImage!.src =
-              "https://uploads-ssl.webflow.com/64a2a18ba276228b93b991d7/64c7c26d6639a8e16ee7797f_Frame%20427318722.webp")
+              'https://uploads-ssl.webflow.com/64a2a18ba276228b93b991d7/64c7c26d6639a8e16ee7797f_Frame%20427318722.webp'),
         );
       } else {
         companyImage!.src =
-          "https://uploads-ssl.webflow.com/64a2a18ba276228b93b991d7/64c7c26d6639a8e16ee7797f_Frame%20427318722.webp";
+          'https://uploads-ssl.webflow.com/64a2a18ba276228b93b991d7/64c7c26d6639a8e16ee7797f_Frame%20427318722.webp';
       }
-      insightNameTarget!.innerHTML = highlightQueryInText(
-        insight.name,
-        searchObject.search
-      );
-      curatedDateTargetWrapper?.classList[curatedDate ? "remove" : "add"](
-        "hide"
-      );
-      curatedDateTarget!.textContent = curatedDate ?? "";
-      publishedDateTarget!.textContent = publishedDate ?? "";
+      insightNameTarget!.innerHTML = highlightQueryInText(insight.name, searchObject.search);
+      curatedDateTargetWrapper?.classList[curatedDate ? 'remove' : 'add']('hide');
+      curatedDateTarget!.textContent = curatedDate ?? '';
+      publishedDateTarget!.textContent = publishedDate ?? '';
       publishedDateTargetWrapper.forEach((item) =>
-        item.classList[publishedDate ? "remove" : "add"]("hide")
+        item.classList[publishedDate ? 'remove' : 'add']('hide'),
       );
-      insightLink!.setAttribute("href", `${route}/insight/` + insight.slug);
-      sourceTarget!.setAttribute("href", insight["source-url"]);
-      sourceTargetWrapper?.classList[insight["source-url"] ? "remove" : "add"](
-        "hide"
-      );
-      companyLink!.setAttribute(
-        "href",
-        `${route}/company/` + insight.company_details.slug
-      );
+      insightLink!.setAttribute('href', `${route}/insight/` + insight.slug);
+      sourceTarget!.setAttribute('href', insight['source-url']);
+      sourceTargetWrapper?.classList[insight['source-url'] ? 'remove' : 'add']('hide');
+      companyLink!.setAttribute('href', `${route}/company/` + insight.company_details.slug);
       sourceTarget!.textContent = insight.source;
       sourceAuthorTargetWrapper.forEach((item) =>
-        item.classList[insight.source_author ? "remove" : "add"]("hide")
+        item.classList[insight.source_author ? 'remove' : 'add']('hide'),
       );
       sourceAuthorTarget!.textContent = insight.source_author;
       target.appendChild(newInsight);
@@ -661,11 +543,7 @@ export async function techPageCode({
 
   const searchDebounce = debounce(insightSearch, 500);
 
-  function insightSearch(
-    technologySlug: string,
-    cb1?: () => void,
-    cb2?: () => void
-  ) {
+  function insightSearch(technologySlug: string, cb1?: () => void, cb2?: () => void) {
     cb1 && cb1();
     getTechnologyCatInsights(technologySlug, {
       orderBy: sortObject.orderBy,
@@ -676,18 +554,15 @@ export async function techPageCode({
   }
 
   function followFavouriteLogic(input: HTMLInputElement) {
-    input.addEventListener("change", async () =>
-      followFavouriteDebounce(input)
-    );
+    input.addEventListener('change', async () => followFavouriteDebounce(input));
   }
 
   const followFavouriteDebounce = debounce(followFavouriteListener, 300);
 
   async function followFavouriteListener(input: HTMLInputElement) {
-    const type = input.getAttribute("dev-input-type")!;
-    const id = input.getAttribute("dev-input-id")!;
-    const endPoint =
-      type === "favourite" ? "/toggle-favourite" : "/toggle-follow";
+    const type = input.getAttribute('dev-input-type')!;
+    const id = input.getAttribute('dev-input-id')!;
+    const endPoint = type === 'favourite' ? '/toggle-favourite' : '/toggle-follow';
     try {
       await xano_userFeed.get(endPoint, {
         id: Number(id),
@@ -708,15 +583,15 @@ export async function techPageCode({
   function sortLogicInit(technologySlug: string) {
     const sortItems = qsa<HTMLLinkElement>(`[dev-target="sort"]`);
     sortItems.forEach((item) => {
-      item.addEventListener("click", () => {
+      item.addEventListener('click', () => {
         sortItems.forEach((sortItem) => {
-          sortItem.classList.remove("active");
+          sortItem.classList.remove('active');
         });
-        item.classList.add("active");
+        item.classList.add('active');
         const value = item.textContent;
         qs(`[dev-target=sorted-item-name]`).textContent = value;
-        const orderBy = item.getAttribute("dev-orderby");
-        const sortBy = item.getAttribute("dev-sortby");
+        const orderBy = item.getAttribute('dev-orderby');
+        const sortBy = item.getAttribute('dev-sortby');
 
         if (sortBy && orderBy) {
           sortObject.sortBy = sortBy;
@@ -730,20 +605,15 @@ export async function techPageCode({
 
   async function getFilters(
     endPoint:
-      | "/company_type"
-      | "/insight_classification"
-      | "/line_of_business"
-      | "/source_category"
-      | "/technology_category",
+      | '/company_type'
+      | '/insight_classification'
+      | '/line_of_business'
+      | '/source_category'
+      | '/technology_category',
     payload: { page?: number; perPage?: number; offset?: number },
-    type:
-      | "companyType"
-      | "sourceCat"
-      | "techCat"
-      | "lineOfBus"
-      | "insightClass",
+    type: 'companyType' | 'sourceCat' | 'techCat' | 'lineOfBus' | 'insightClass',
     targetWrapper: HTMLDivElement,
-    technologySlug: string
+    technologySlug: string,
   ) {
     const { page = 0, perPage = 0, offset = 0 } = payload;
     try {
@@ -760,23 +630,20 @@ export async function techPageCode({
       });
       const filters = res.getBody() as FilterResponse[];
       filters.forEach((filter) => {
-        const newFilter = checkboxItemTemplate.cloneNode(
-          true
-        ) as HTMLDivElement;
-        const input =
-          newFilter.querySelector<HTMLInputElement>("[dev-target=input]");
+        const newFilter = checkboxItemTemplate.cloneNode(true) as HTMLDivElement;
+        const input = newFilter.querySelector<HTMLInputElement>('[dev-target=input]');
         input && fakeCheckboxToggle(input);
-        input?.addEventListener("change", () => {
+        input?.addEventListener('change', () => {
           if (input.checked) {
             searchObject.checkboxes[type].push(filter.id);
           } else {
-            searchObject.checkboxes[type] = searchObject.checkboxes[
-              type
-            ].filter((item) => item != filter.id);
+            searchObject.checkboxes[type] = searchObject.checkboxes[type].filter(
+              (item) => item != filter.id,
+            );
           }
           searchDebounce(technologySlug);
         });
-        newFilter.querySelector("[dev-target=name]")!.textContent = filter.name;
+        newFilter.querySelector('[dev-target=name]')!.textContent = filter.name;
         targetWrapper.appendChild(newFilter);
       });
       return filters;
@@ -788,41 +655,34 @@ export async function techPageCode({
 
   function updateInsightsInputs(insight: HTMLDivElement) {
     const companyInputs = insight.querySelectorAll<HTMLInputElement>(
-      `[dev-input-type="company_id"]`
+      `[dev-input-type="company_id"]`,
     );
     companyInputs.forEach((companyInput) => {
       companyInput &&
         setCheckboxesInitialState(
           companyInput,
-          convertArrayOfObjToNumber(
-            userFollowingAndFavourite?.user_following.company_id!
-          )
+          convertArrayOfObjToNumber(userFollowingAndFavourite?.user_following.company_id!),
         );
     });
-    const favorites = insight.querySelectorAll<HTMLInputElement>(
-      `[dev-input="fav-insight"]`
-    );
+    const favorites = insight.querySelectorAll<HTMLInputElement>(`[dev-input="fav-insight"]`);
     favorites.forEach((favourite) => {
       favourite &&
-        setCheckboxesInitialState(
-          favourite,
-          userFollowingAndFavourite?.user_favourite.insight_id!
-        );
+        setCheckboxesInitialState(favourite, userFollowingAndFavourite?.user_favourite.insight_id!);
     });
     const tagInputs = insight.querySelectorAll<HTMLInputElement>(
-      `[dev-input-type="technology_category_id"]`
+      `[dev-input-type="technology_category_id"]`,
     );
 
     techCatCards.forEach((techCatCard) => {
       const pageTechCatInput = techCatCard.querySelector<HTMLInputElement>(
-        `[dev-input-type="technology_category_id"]`
+        `[dev-input-type="technology_category_id"]`,
       );
       pageTechCatInput &&
         setCheckboxesInitialState(
           pageTechCatInput,
           convertArrayOfObjToNumber(
-            userFollowingAndFavourite?.user_following.technology_category_id!
-          )
+            userFollowingAndFavourite?.user_following.technology_category_id!,
+          ),
         );
     });
 
@@ -830,33 +690,30 @@ export async function techPageCode({
       setCheckboxesInitialState(
         tag,
         convertArrayOfObjToNumber(
-          userFollowingAndFavourite?.user_following.technology_category_id!
-        )
+          userFollowingAndFavourite?.user_following.technology_category_id!,
+        ),
       );
     });
   }
 
   async function getTechnologyCat(slug: string) {
     try {
-      const res = await xano_individual_pages.get("/technology_category_item", {
+      const res = await xano_individual_pages.get('/technology_category_item', {
         slug,
       });
       const event = res.getBody() as Event;
       if (event === null) {
-        window.location.href = "/404";
+        window.location.href = '/404';
         return null;
       }
-      qs("title").textContent = event.name;
-      console.log("event", event);
+      qs('title').textContent = event.name;
+      console.log('event', event);
 
       techCatCards.forEach((techCatCard) => {
-        const techCatName = techCatCard.querySelector<HTMLHeadingElement>(
-          `[dev-target=event-name]`
-        );
+        const techCatName =
+          techCatCard.querySelector<HTMLHeadingElement>(`[dev-target=event-name]`);
 
-        const eventImageWrapper = techCatCard.querySelector(
-          `[dev-target=event-image-wrapper]`
-        );
+        const eventImageWrapper = techCatCard.querySelector(`[dev-target=event-image-wrapper]`);
         // const eventImageLink =
         //   eventImageWrapper?.querySelector<HTMLLinkElement>(
         //     `[dev-target=event-picture-link]`
@@ -864,54 +721,46 @@ export async function techPageCode({
         // const eventImage = eventImageWrapper?.querySelector(
         //   `[dev-target=event-image]`
         // );
-        const eventInput = eventImageWrapper?.querySelector<HTMLInputElement>(
-          `[dev-target=event-input]`
-        );
+        const eventInput =
+          eventImageWrapper?.querySelector<HTMLInputElement>(`[dev-target=event-input]`);
 
         techCatName!.textContent = event.name;
 
         cardSkeletons.forEach((cardSkeleton) => cardSkeleton.remove());
-        techCatCard.classList.remove("dev-hide");
+        techCatCard.classList.remove('dev-hide');
 
         fakeCheckboxToggle(eventInput!);
-        eventInput?.setAttribute("dev-input-type", "technology_category_id");
-        eventInput?.setAttribute("dev-input-id", event.id.toString());
+        eventInput?.setAttribute('dev-input-type', 'technology_category_id');
+        eventInput?.setAttribute('dev-input-id', event.id.toString());
         eventInput && followFavouriteLogic(eventInput);
         eventInput &&
           setCheckboxesInitialState(
             eventInput,
             convertArrayOfObjToNumber(
-              userFollowingAndFavourite!.user_following.technology_category_id
-            )
+              userFollowingAndFavourite!.user_following.technology_category_id,
+            ),
           );
       });
       eventDetails.forEach((item) => {
-        item.classList.remove("opacity-hide");
+        item.classList.remove('opacity-hide');
       });
 
       return event;
     } catch (error) {
-      console.log("getTechnologyCat_error", error);
+      console.log('getTechnologyCat_error', error);
       return null;
     }
   }
 
-  function setCheckboxesInitialState(
-    input: HTMLInputElement,
-    slugArray: number[]
-  ) {
-    const inputId = input.getAttribute("dev-input-id");
+  function setCheckboxesInitialState(input: HTMLInputElement, slugArray: number[]) {
+    const inputId = input.getAttribute('dev-input-id');
 
     if (slugArray.includes(Number(inputId))) {
       input.checked = true;
-      input
-        .closest<HTMLDivElement>("[dev-fake-checkbox-wrapper]")
-        ?.classList.add("checked");
+      input.closest<HTMLDivElement>('[dev-fake-checkbox-wrapper]')?.classList.add('checked');
     } else {
       input.checked = false;
-      input
-        .closest<HTMLDivElement>("[dev-fake-checkbox-wrapper]")
-        ?.classList.remove("checked");
+      input.closest<HTMLDivElement>('[dev-fake-checkbox-wrapper]')?.classList.remove('checked');
     }
   }
 
@@ -928,54 +777,41 @@ export async function techPageCode({
     )[],
     targetWrapper: HTMLDivElement,
     showCheckbox: boolean,
-    type?: "technology_category_id"
+    type?: 'technology_category_id',
   ) {
     tagArray.forEach((item) => {
-      if (typeof item === "object" && item !== null) {
+      if (typeof item === 'object' && item !== null) {
         const newTag = insightTagTemplate.cloneNode(true) as HTMLDivElement;
-        const tagCheckbox = newTag.querySelector<HTMLDivElement>(
-          `[dev-target=fake-checkbox]`
-        );
-        const tagInput = newTag.querySelector<HTMLInputElement>(
-          `[dev-target=tag-input]`
-        );
+        const tagCheckbox = newTag.querySelector<HTMLDivElement>(`[dev-target=fake-checkbox]`);
+        const tagInput = newTag.querySelector<HTMLInputElement>(`[dev-target=tag-input]`);
         showCheckbox && tagInput && fakeCheckboxToggle(tagInput);
-        showCheckbox &&
-          type &&
-          tagInput &&
-          tagInput.setAttribute("dev-input-type", type);
-        showCheckbox &&
-          tagInput &&
-          tagInput.setAttribute("dev-input-id", item.id.toString());
+        showCheckbox && type && tagInput && tagInput.setAttribute('dev-input-type', type);
+        showCheckbox && tagInput && tagInput.setAttribute('dev-input-id', item.id.toString());
         showCheckbox && tagInput && followFavouriteLogic(tagInput);
-        newTag.querySelector(`[dev-target=tag-name]`)!.textContent =
-          item?.name!;
+        newTag.querySelector(`[dev-target=tag-name]`)!.textContent = item?.name!;
 
         if (showCheckbox) {
-          const tagSpan = newTag.querySelector<HTMLSpanElement>(
-            `[dev-target="tag-name"]`
-          );
-          newTag.style.cursor = "pointer";
-          newTag.querySelector<HTMLLabelElement>(
-            `[dev-fake-checkbox-wrapper]`
-          )!.style.cursor = "pointer";
-          const anchor = document.createElement("a");
+          const tagSpan = newTag.querySelector<HTMLSpanElement>(`[dev-target="tag-name"]`);
+          newTag.style.cursor = 'pointer';
+          newTag.querySelector<HTMLLabelElement>(`[dev-fake-checkbox-wrapper]`)!.style.cursor =
+            'pointer';
+          const anchor = document.createElement('a');
           anchor.href = `${route}/technology/${item.slug}`;
           anchor.innerHTML = highlightQueryInText(tagSpan!.textContent!, query);
-          anchor.style.cursor = "pointer";
-          anchor.classList.add("tag-span-name");
+          anchor.style.cursor = 'pointer';
+          anchor.classList.add('tag-span-name');
           tagSpan?.replaceWith(anchor);
         }
 
         if (tagCheckbox && !showCheckbox) {
-          tagCheckbox.style.display = "none";
+          tagCheckbox.style.display = 'none';
         }
         if (showCheckbox && tagInput && userFollowingAndFavourite) {
           setCheckboxesInitialState(
             tagInput,
             convertArrayOfObjToNumber(
-              userFollowingAndFavourite?.user_following.technology_category_id
-            )
+              userFollowingAndFavourite?.user_following.technology_category_id,
+            ),
           );
         }
 
@@ -986,19 +822,17 @@ export async function techPageCode({
 
   function formatPublishedDate(inputDate: Date) {
     const date = new Date(inputDate);
-    return `${date.toLocaleString("default", {
-      month: "long",
-      timeZone: "UTC",
+    return `${date.toLocaleString('default', {
+      month: 'long',
+      timeZone: 'UTC',
     })} ${date.getUTCDate()}, ${date.getFullYear()}`;
   }
 
   // Function to toggle fake checkboxes
   function fakeCheckboxToggle(input: HTMLInputElement) {
-    input.addEventListener("change", () => {
-      const inputWrapper = input.closest(
-        "[dev-fake-checkbox-wrapper]"
-      ) as HTMLDivElement;
-      inputWrapper.classList[input.checked ? "add" : "remove"]("checked");
+    input.addEventListener('change', () => {
+      const inputWrapper = input.closest('[dev-fake-checkbox-wrapper]') as HTMLDivElement;
+      inputWrapper.classList[input.checked ? 'add' : 'remove']('checked');
     });
   }
 
@@ -1011,19 +845,14 @@ export async function techPageCode({
     query: string,
     maxSentences: number,
     maxWords?: number,
-    stripHtml: boolean = false
+    stripHtml: boolean = false,
   ): string[] {
-    if (
-      !text ||
-      !query ||
-      typeof text !== "string" ||
-      typeof query !== "string"
-    ) {
+    if (!text || !query || typeof text !== 'string' || typeof query !== 'string') {
       return [];
     }
 
     if (stripHtml) {
-      text = text.replace(/<[^>]+>/g, "");
+      text = text.replace(/<[^>]+>/g, '');
     }
 
     let sentences = text.match(/[^.!?]+[.!?]/g);
@@ -1040,16 +869,16 @@ export async function techPageCode({
     }
 
     // Remove quoted phrases from query
-    const queryWithoutQuotes = query.replace(phraseRegex, "");
+    const queryWithoutQuotes = query.replace(phraseRegex, '');
     const individualWords = queryWithoutQuotes.split(/\s+/).filter(Boolean);
 
     const allQueryParts = [...phrases, ...individualWords];
 
     const escapedQueryWords = allQueryParts.map((word) =>
-      word.replace(/[.*+?^${}()|[\]\\]/g, "\\$&").toLowerCase()
+      word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').toLowerCase(),
     );
 
-    const regex = new RegExp(`(${escapedQueryWords.join("|")})`, "gi");
+    const regex = new RegExp(`(${escapedQueryWords.join('|')})`, 'gi');
     const highlighted: string[] = [];
 
     for (const sentence of sentences) {
@@ -1060,7 +889,7 @@ export async function techPageCode({
         if (maxWords) {
           const words = snippet.split(/\s+/);
           const matchIndex = words.findIndex((word) =>
-            escapedQueryWords.some((q) => word.toLowerCase().includes(q))
+            escapedQueryWords.some((q) => word.toLowerCase().includes(q)),
           );
 
           let snippetStart = 0;
@@ -1068,20 +897,14 @@ export async function techPageCode({
             snippetStart = Math.max(0, matchIndex - Math.floor(maxWords / 2));
           }
 
-          const snippetWords = words.slice(
-            snippetStart,
-            snippetStart + maxWords
-          );
-          snippet = snippetWords.join(" ");
+          const snippetWords = words.slice(snippetStart, snippetStart + maxWords);
+          snippet = snippetWords.join(' ');
           if (snippetStart + maxWords < words.length) {
-            snippet += "...";
+            snippet += '...';
           }
         }
 
-        const highlightedSnippet = snippet.replace(
-          regex,
-          "<mark class='highlight'>$1</mark>"
-        );
+        const highlightedSnippet = snippet.replace(regex, "<mark class='highlight'>$1</mark>");
 
         highlighted.push(highlightedSnippet);
 
@@ -1092,12 +915,7 @@ export async function techPageCode({
     return highlighted;
   }
   function highlightQueryInText(text: string, query: string): string {
-    if (
-      !text ||
-      !query ||
-      typeof text !== "string" ||
-      typeof query !== "string"
-    ) {
+    if (!text || !query || typeof text !== 'string' || typeof query !== 'string') {
       return text;
     }
 
@@ -1110,7 +928,7 @@ export async function techPageCode({
     }
 
     // Remove quoted phrases from query string
-    const queryWithoutQuotes = query.replace(phraseRegex, "");
+    const queryWithoutQuotes = query.replace(phraseRegex, '');
     const individualWords = queryWithoutQuotes
       .split(/\s+/)
       .map((w) => w.trim())
@@ -1122,43 +940,35 @@ export async function techPageCode({
     if (allQueryParts.length === 0) return text;
 
     // Escape special characters for regex
-    const escapedParts = allQueryParts.map((word) =>
-      word.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
-    );
+    const escapedParts = allQueryParts.map((word) => word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
 
     // Create regex for whole words/phrases
-    const regex = new RegExp(`(${escapedParts.join("|")})`, "gi");
+    const regex = new RegExp(`(${escapedParts.join('|')})`, 'gi');
 
     // Replace matches with <mark>
     return text.replace(regex, "<mark class='highlight'>$1</mark>");
   }
   function searchAccordionLogic(item: HTMLDivElement) {
-    const trigger = item.querySelector<HTMLDivElement>(
-      '[dev-target="search-list-trigger"]'
-    );
+    const trigger = item.querySelector<HTMLDivElement>('[dev-target="search-list-trigger"]');
     const triggerIcon = trigger?.querySelector(`svg`)!;
-    const wrapper = item.querySelector<HTMLDivElement>(
-      '[dev-target="search-result-list-wrapper"]'
-    );
-    const content = item.querySelector<HTMLDivElement>(
-      '[dev-target="search-result-list"]'
-    );
+    const wrapper = item.querySelector<HTMLDivElement>('[dev-target="search-result-list-wrapper"]');
+    const content = item.querySelector<HTMLDivElement>('[dev-target="search-result-list"]');
     // const defaultHeight = content?.scrollHeight ?? 100;
     // if (wrapper) wrapper.style.height = defaultHeight + "px";
-    if (wrapper) wrapper.style.height = "0px";
-    triggerIcon.style.rotate = "180deg";
+    if (wrapper) wrapper.style.height = '0px';
+    triggerIcon.style.rotate = '180deg';
 
     let isOpen = false;
 
-    trigger?.addEventListener("click", function () {
+    trigger?.addEventListener('click', function () {
       if (!isOpen) {
         const fullHeight = content?.scrollHeight ?? 100;
-        if (wrapper) wrapper.style.height = fullHeight + "px";
-        triggerIcon.style.rotate = "0deg";
+        if (wrapper) wrapper.style.height = fullHeight + 'px';
+        triggerIcon.style.rotate = '0deg';
         isOpen = true;
       } else {
-        if (wrapper) wrapper.style.height = "0px";
-        triggerIcon.style.rotate = "180deg";
+        if (wrapper) wrapper.style.height = '0px';
+        triggerIcon.style.rotate = '180deg';
         isOpen = false;
       }
     });
@@ -1170,11 +980,11 @@ interface Event {
   created_at: string;
   name: string;
   slug: string;
-  "event-start-date": string;
-  "event-end-date": string;
-  "event-city-state": string;
-  "event-venue-name": string;
+  'event-start-date': string;
+  'event-end-date': string;
+  'event-city-state': string;
+  'event-venue-name': string;
   people_id: number[];
-  "event-description": string;
+  'event-description': string;
   image: { url: string } | null;
 }

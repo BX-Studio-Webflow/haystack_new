@@ -1,5 +1,5 @@
-import { techPageCode } from "../../utils/technology";
+import { techPageCode } from '../../utils/technology';
 
-document.addEventListener("DOMContentLoaded", async () => {
-  techPageCode({ dataSource: "dev" });
+document.addEventListener('DOMContentLoaded', async () => {
+  techPageCode({ dataSource: 'dev' });
 });

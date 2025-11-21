@@ -1,51 +1,39 @@
-import { XanoClient } from "@xano/js-sdk";
-import { debounce, qs } from "../../utils";
+import { XanoClient } from '@xano/js-sdk';
+import { debounce, qs } from '../../utils';
 
-export async function searchCode({
-  dataSource,
-}: {
-  dataSource: "live" | "dev";
-}) {
-  const route = dataSource === "dev" ? "/dev" : "";
+export async function searchCode({ dataSource }: { dataSource: 'live' | 'dev' }) {
+  const route = dataSource === 'dev' ? '/dev' : '';
   const xano_global_search = new XanoClient({
-    apiGroupBaseUrl: "https://xhka-anc3-3fve.n7c.xano.io/api:G4uo48hy",
+    apiGroupBaseUrl: 'https://xhka-anc3-3fve.n7c.xano.io/api:G4uo48hy',
   }).setDataSource(dataSource);
   const xano_wmx = new XanoClient({
-    apiGroupBaseUrl: "https://xhka-anc3-3fve.n7c.xano.io/api:6Ie7e140",
+    apiGroupBaseUrl: 'https://xhka-anc3-3fve.n7c.xano.io/api:6Ie7e140',
   }).setDataSource(dataSource);
 
-  const memberStackUserToken = localStorage.getItem("_ms-mid");
-  const lsXanoAuthToken = localStorage.getItem("AuthToken");
+  const memberStackUserToken = localStorage.getItem('_ms-mid');
+  const lsXanoAuthToken = localStorage.getItem('AuthToken');
 
-  const searchForm = qs<HTMLFormElement>("[dev-search-form]");
-  const searchInput = qs<HTMLInputElement>("[dev-global-search]");
-  const searchResultWrapper = qs("[dev-global-search-result-wrapper]");
-  const companySearchItem = qs<HTMLLinkElement>(
-    "[dev-template=company-search-item]"
-  );
-  const insightSearchItem = qs<HTMLLinkElement>(
-    "[dev-template=insight-search-item]"
-  );
-  const personSearchItem = qs<HTMLLinkElement>(
-    "[dev-template=person-search-item]"
-  );
-  const eventSearchItem = qs<HTMLLinkElement>(
-    "[dev-template=event-search-item]"
-  );
+  const searchForm = qs<HTMLFormElement>('[dev-search-form]');
+  const searchInput = qs<HTMLInputElement>('[dev-global-search]');
+  const searchResultWrapper = qs('[dev-global-search-result-wrapper]');
+  const companySearchItem = qs<HTMLLinkElement>('[dev-template=company-search-item]');
+  const insightSearchItem = qs<HTMLLinkElement>('[dev-template=insight-search-item]');
+  const personSearchItem = qs<HTMLLinkElement>('[dev-template=person-search-item]');
+  const eventSearchItem = qs<HTMLLinkElement>('[dev-template=event-search-item]');
   // const searchResult = qs("[dev-global-search-result]");
-  const companiesResultsWrapper = qs("[dev-target=companies-results-wrapper]");
-  const insightsResultsWrapper = qs("[dev-target=insights-results-wrapper]");
-  const peopleResultsWrapper = qs("[dev-target=people-results-wrapper]");
-  const eventsResultsWrapper = qs("[dev-target=events-results-wrapper]");
-  const companiesResults = qs("[dev-companies-result]");
-  const peopleResults = qs("[dev-people-result]");
-  const eventsResults = qs("[dev-events-result]");
-  const insightsResults = qs("[dev-insights-result]");
+  const companiesResultsWrapper = qs('[dev-target=companies-results-wrapper]');
+  const insightsResultsWrapper = qs('[dev-target=insights-results-wrapper]');
+  const peopleResultsWrapper = qs('[dev-target=people-results-wrapper]');
+  const eventsResultsWrapper = qs('[dev-target=events-results-wrapper]');
+  const companiesResults = qs('[dev-companies-result]');
+  const peopleResults = qs('[dev-people-result]');
+  const eventsResults = qs('[dev-events-result]');
+  const insightsResults = qs('[dev-insights-result]');
   // const emptyState = qs("[dev-no-search-results]");
-  console.log("searchInput", searchInput);
+  console.log('searchInput', searchInput);
 
   if (!memberStackUserToken) {
-    return console.error("No memberstack token");
+    return console.error('No memberstack token');
   }
 
   if (lsXanoAuthToken) {
@@ -54,22 +42,22 @@ export async function searchCode({
     await getXanoAccessToken(memberStackUserToken);
   }
 
-  searchForm.addEventListener("submit", (e) => {
+  searchForm.addEventListener('submit', (e) => {
     e.preventDefault();
   });
-  searchInput.addEventListener("blur", () => {
+  searchInput.addEventListener('blur', () => {
     setTimeout(() => {
-      searchResultWrapper.style.height = "0px";
+      searchResultWrapper.style.height = '0px';
     }, 500);
   });
-  searchInput.addEventListener("focus", () => {
+  searchInput.addEventListener('focus', () => {
     if (searchInput.value) {
-      searchResultWrapper.style.height = "500px";
+      searchResultWrapper.style.height = '500px';
     }
   });
-  searchInput.addEventListener("input", () => {
+  searchInput.addEventListener('input', () => {
     const inputValue = searchInput.value;
-    console.log("inputValue", inputValue);
+    console.log('inputValue', inputValue);
 
     searchDebounce(inputValue);
   });
@@ -80,30 +68,28 @@ export async function searchCode({
       searchCompany(inputValue);
       searchPerson(inputValue);
       searchEvent(inputValue);
-      searchResultWrapper.style.height = "500px";
+      searchResultWrapper.style.height = '500px';
     } else {
-      searchResultWrapper.style.height = "0px";
+      searchResultWrapper.style.height = '0px';
     }
   }
 
   async function searchCompany(searchQuery: string) {
     try {
-      const res = await xano_global_search.get("/company", {
+      const res = await xano_global_search.get('/company', {
         search_query: searchQuery,
       });
       const companies = res.getBody() as Company[];
 
-      companiesResults.innerHTML = "";
+      companiesResults.innerHTML = '';
       if (companies.length === 0) {
-        companiesResultsWrapper.classList.add("hide");
+        companiesResultsWrapper.classList.add('hide');
       } else {
-        companiesResultsWrapper.classList.remove("hide");
+        companiesResultsWrapper.classList.remove('hide');
       }
 
       companies.forEach((company) => {
-        const companyItem = companySearchItem.cloneNode(
-          true
-        ) as HTMLLinkElement;
+        const companyItem = companySearchItem.cloneNode(true) as HTMLLinkElement;
         const name = companyItem.querySelector(`[dev-target=name]`);
         const about = companyItem.querySelector(`[dev-target=about]`);
         const smallDesc = companyItem.querySelector(`[dev-target=small-desc]`);
@@ -111,69 +97,56 @@ export async function searchCode({
         companyItem!.href = `${route}/company/` + company.slug;
         name!.textContent = company.name;
         about!.textContent = removeHTMLTags(company.about);
-        smallDesc!.textContent = company["description-small"];
+        smallDesc!.textContent = company['description-small'];
 
         name!.innerHTML = highlightSearchQuery(name!.innerHTML, searchQuery);
         about!.innerHTML = highlightSearchQuery(about!.innerHTML, searchQuery);
-        smallDesc!.innerHTML = highlightSearchQuery(
-          smallDesc!.innerHTML,
-          searchQuery
-        );
+        smallDesc!.innerHTML = highlightSearchQuery(smallDesc!.innerHTML, searchQuery);
 
         about?.classList[
-          about!.textContent.toLowerCase().includes(searchQuery.toLowerCase())
-            ? "remove"
-            : "add"
-        ]("hide");
+          about!.textContent.toLowerCase().includes(searchQuery.toLowerCase()) ? 'remove' : 'add'
+        ]('hide');
         smallDesc?.classList[
-          smallDesc!.textContent
-            .toLowerCase()
-            .includes(searchQuery.toLowerCase())
-            ? "remove"
-            : "add"
-        ]("hide");
+          smallDesc!.textContent.toLowerCase().includes(searchQuery.toLowerCase())
+            ? 'remove'
+            : 'add'
+        ]('hide');
 
         companiesResults.appendChild(companyItem);
       });
 
-      console.log("companies", companies);
+      console.log('companies', companies);
     } catch (error) {
-      console.error("searchCompany_error", error);
+      console.error('searchCompany_error', error);
     }
   }
   async function searchInsight(searchQuery: string) {
     try {
-      const res = await xano_global_search.get("/insight", {
+      const res = await xano_global_search.get('/insight', {
         search_query: searchQuery,
       });
       const insights = res.getBody() as Insight[];
 
-      insightsResults.innerHTML = "";
+      insightsResults.innerHTML = '';
       if (insights.length === 0) {
-        insightsResultsWrapper.classList.add("hide");
+        insightsResultsWrapper.classList.add('hide');
       } else {
-        insightsResultsWrapper.classList.remove("hide");
+        insightsResultsWrapper.classList.remove('hide');
       }
 
       insights.forEach((insight) => {
-        const insightItem = insightSearchItem.cloneNode(
-          true
-        ) as HTMLLinkElement;
+        const insightItem = insightSearchItem.cloneNode(true) as HTMLLinkElement;
         const name = insightItem.querySelector(`[dev-target=name]`);
         const moreContentIndicator = insightItem.querySelector(
-          `[dev-target=more-content-indicator]`
+          `[dev-target=more-content-indicator]`,
         );
         const source = insightItem.querySelector(`[dev-target=source]`);
-        const insightDetails = insightItem.querySelector(
-          `[dev-target=insight-detail]`
-        );
-        const description = insightItem.querySelector(
-          `[dev-target=description]`
-        );
+        const insightDetails = insightItem.querySelector(`[dev-target=insight-detail]`);
+        const description = insightItem.querySelector(`[dev-target=description]`);
 
         insightItem!.href = `${route}/insight/` + insight.slug;
         name!.textContent = insight.name;
-        insightDetails!.textContent = removeHTMLTags(insight["insight-detail"]);
+        insightDetails!.textContent = removeHTMLTags(insight['insight-detail']);
         description!.textContent = insight.description;
         source!.textContent = insight.source;
 
@@ -182,29 +155,22 @@ export async function searchCode({
         //   insightDetails!.innerHTML,
         //   searchQuery
         // );
-        source!.innerHTML = highlightSearchQuery(
-          source!.innerHTML,
-          searchQuery
-        );
+        source!.innerHTML = highlightSearchQuery(source!.innerHTML, searchQuery);
         // description!.innerHTML = highlightSearchQuery(
         //   description!.innerHTML,
         //   searchQuery
         // );
 
-        insightDetails?.classList.add("hide");
-        description?.classList.add("hide");
+        insightDetails?.classList.add('hide');
+        description?.classList.add('hide');
 
         if (
-          insightDetails!.textContent
-            .toLocaleLowerCase()
-            .includes(searchQuery.toLowerCase()) ||
-          insightDetails!.textContent
-            .toLocaleLowerCase()
-            .includes(searchQuery.toLowerCase())
+          insightDetails!.textContent.toLocaleLowerCase().includes(searchQuery.toLowerCase()) ||
+          insightDetails!.textContent.toLocaleLowerCase().includes(searchQuery.toLowerCase())
         ) {
-          moreContentIndicator?.classList.remove("hide");
+          moreContentIndicator?.classList.remove('hide');
         } else {
-          moreContentIndicator?.classList.add("hide");
+          moreContentIndicator?.classList.add('hide');
         }
 
         // insightDetails?.classList[
@@ -222,30 +188,28 @@ export async function searchCode({
         //     : "add"
         // ]("hide");
         source?.classList[
-          source!.textContent.toLowerCase().includes(searchQuery.toLowerCase())
-            ? "remove"
-            : "add"
-        ]("hide");
+          source!.textContent.toLowerCase().includes(searchQuery.toLowerCase()) ? 'remove' : 'add'
+        ]('hide');
 
         insightsResults.appendChild(insightItem);
       });
-      console.log("insights", insights);
+      console.log('insights', insights);
     } catch (error) {
-      console.error("searchInsight_error", error);
+      console.error('searchInsight_error', error);
     }
   }
   async function searchPerson(searchQuery: string) {
     try {
-      const res = await xano_global_search.get("/person", {
+      const res = await xano_global_search.get('/person', {
         search_query: searchQuery,
       });
       const people = res.getBody() as Person[];
 
-      peopleResults.innerHTML = "";
+      peopleResults.innerHTML = '';
       if (people.length === 0) {
-        peopleResultsWrapper.classList.add("hide");
+        peopleResultsWrapper.classList.add('hide');
       } else {
-        peopleResultsWrapper.classList.remove("hide");
+        peopleResultsWrapper.classList.remove('hide');
       }
 
       people.forEach((person) => {
@@ -264,35 +228,31 @@ export async function searchCode({
         bio!.innerHTML = highlightSearchQuery(bio!.innerHTML, searchQuery);
 
         title?.classList[
-          title!.textContent.toLowerCase().includes(searchQuery.toLowerCase())
-            ? "remove"
-            : "add"
-        ]("hide");
+          title!.textContent.toLowerCase().includes(searchQuery.toLowerCase()) ? 'remove' : 'add'
+        ]('hide');
         bio?.classList[
-          bio!.textContent.toLowerCase().includes(searchQuery.toLowerCase())
-            ? "remove"
-            : "add"
-        ]("hide");
+          bio!.textContent.toLowerCase().includes(searchQuery.toLowerCase()) ? 'remove' : 'add'
+        ]('hide');
 
         peopleResults.appendChild(personItem);
       });
-      console.log("people", people);
+      console.log('people', people);
     } catch (error) {
-      console.error("searchPerson_error", error);
+      console.error('searchPerson_error', error);
     }
   }
   async function searchEvent(searchQuery: string) {
     try {
-      const res = await xano_global_search.get("/event", {
+      const res = await xano_global_search.get('/event', {
         search_query: searchQuery,
       });
       const events = res.getBody() as Event[];
 
-      eventsResults.innerHTML = "";
+      eventsResults.innerHTML = '';
       if (events.length === 0) {
-        eventsResultsWrapper.classList.add("hide");
+        eventsResultsWrapper.classList.add('hide');
       } else {
-        eventsResultsWrapper.classList.remove("hide");
+        eventsResultsWrapper.classList.remove('hide');
       }
 
       events.forEach((event) => {
@@ -304,69 +264,57 @@ export async function searchCode({
 
         eventItem!.href = `${route}/event/` + event.slug;
         name!.textContent = event.name;
-        city!.textContent = event["event-city-state"];
-        venue!.textContent = event["event-venue-name"];
-        description!.textContent = removeHTMLTags(event["event-description"]);
+        city!.textContent = event['event-city-state'];
+        venue!.textContent = event['event-venue-name'];
+        description!.textContent = removeHTMLTags(event['event-description']);
 
         name!.innerHTML = highlightSearchQuery(name!.innerHTML, searchQuery);
         city!.innerHTML = highlightSearchQuery(city!.innerHTML, searchQuery);
         venue!.innerHTML = highlightSearchQuery(venue!.innerHTML, searchQuery);
-        description!.innerHTML = highlightSearchQuery(
-          description!.innerHTML,
-          searchQuery
-        );
+        description!.innerHTML = highlightSearchQuery(description!.innerHTML, searchQuery);
 
         city?.classList[
-          city!.textContent.toLowerCase().includes(searchQuery.toLowerCase())
-            ? "remove"
-            : "add"
-        ]("hide");
+          city!.textContent.toLowerCase().includes(searchQuery.toLowerCase()) ? 'remove' : 'add'
+        ]('hide');
         venue?.classList[
-          venue!.textContent.toLowerCase().includes(searchQuery.toLowerCase())
-            ? "remove"
-            : "add"
-        ]("hide");
+          venue!.textContent.toLowerCase().includes(searchQuery.toLowerCase()) ? 'remove' : 'add'
+        ]('hide');
         description?.classList[
-          description!.textContent
-            .toLowerCase()
-            .includes(searchQuery.toLowerCase())
-            ? "remove"
-            : "add"
-        ]("hide");
+          description!.textContent.toLowerCase().includes(searchQuery.toLowerCase())
+            ? 'remove'
+            : 'add'
+        ]('hide');
 
         eventsResults.appendChild(eventItem);
       });
-      console.log("events", events);
+      console.log('events', events);
     } catch (error) {
-      console.error("searchEvent_error", error);
+      console.error('searchEvent_error', error);
     }
   }
 
   async function getXanoAccessToken(memberstackToken: string) {
     try {
-      const res = await xano_wmx.post("/auth-user", {
+      const res = await xano_wmx.post('/auth-user', {
         memberstack_token: memberstackToken,
       });
       const xanoAuthToken = res.getBody().authToken as string;
       xano_global_search.setAuthToken(xanoAuthToken);
       return xanoAuthToken;
     } catch (error) {
-      console.log("getXanoAccessToken_error", error);
+      console.log('getXanoAccessToken_error', error);
       return null;
     }
   }
 
   function highlightSearchQuery(paragraph: string, searchQuery: string) {
-    const regex = new RegExp(`(${searchQuery.split(/\s+/).join("|")})`, "gi");
-    const highlightedText = paragraph.replace(
-      regex,
-      '<span class="highlight">$1</span>'
-    );
+    const regex = new RegExp(`(${searchQuery.split(/\s+/).join('|')})`, 'gi');
+    const highlightedText = paragraph.replace(regex, '<span class="highlight">$1</span>');
     return highlightedText;
   }
 
   function removeHTMLTags(rawHTML: string) {
-    return rawHTML.replace(/<[^>]*>/g, "");
+    return rawHTML.replace(/<[^>]*>/g, '');
   }
 
   const searchDebounce = debounce(searchFunction, 500);
@@ -390,7 +338,7 @@ interface Company {
   name: string;
   slug: string;
   about: string;
-  "description-small": string;
+  'description-small': string;
 }
 interface Insight {
   id: number;
@@ -398,7 +346,7 @@ interface Insight {
   slug: string;
   description: string;
   source: string;
-  "insight-detail": string;
+  'insight-detail': string;
 }
 interface Person {
   id: number;
@@ -411,7 +359,7 @@ interface Event {
   id: number;
   name: string;
   slug: string;
-  "event-description": string;
-  "event-venue-name": string;
-  "event-city-state": string;
+  'event-description': string;
+  'event-venue-name': string;
+  'event-city-state': string;
 }

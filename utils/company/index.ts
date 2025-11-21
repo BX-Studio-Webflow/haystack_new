@@ -1,4 +1,4 @@
-import { XanoClient } from "@xano/js-sdk";
+import { XanoClient } from '@xano/js-sdk';
 import {
   Company,
   FilterResponse,
@@ -6,28 +6,24 @@ import {
   PersonInsightResponse,
   SearchObject,
   UserFollowingAndFavourite,
-} from "../../types";
-import { debounce, formatCuratedDate, qs, qsa } from "../../utils";
+} from '../../types';
+import { debounce, formatCuratedDate, qs, qsa } from '../../utils';
 
-export async function companyPageCode({
-  dataSource,
-}: {
-  dataSource: "live" | "dev";
-}) {
-  const route = dataSource === "dev" ? "/dev" : "";
+export async function companyPageCode({ dataSource }: { dataSource: 'live' | 'dev' }) {
+  const route = dataSource === 'dev' ? '/dev' : '';
 
   const xano_individual_pages = new XanoClient({
-    apiGroupBaseUrl: "https://xhka-anc3-3fve.n7c.xano.io/api:CvEH0ZFk",
+    apiGroupBaseUrl: 'https://xhka-anc3-3fve.n7c.xano.io/api:CvEH0ZFk',
   }).setDataSource(dataSource);
   const xano_wmx = new XanoClient({
-    apiGroupBaseUrl: "https://xhka-anc3-3fve.n7c.xano.io/api:6Ie7e140",
+    apiGroupBaseUrl: 'https://xhka-anc3-3fve.n7c.xano.io/api:6Ie7e140',
   }).setDataSource(dataSource);
   const xano_userFeed = new XanoClient({
-    apiGroupBaseUrl: "https://xhka-anc3-3fve.n7c.xano.io/api:Hv8ldLVU",
+    apiGroupBaseUrl: 'https://xhka-anc3-3fve.n7c.xano.io/api:Hv8ldLVU',
   }).setDataSource(dataSource);
 
   const searchObject: SearchObject = {
-    search: "",
+    search: '',
     checkboxes: {
       companyType: [],
       sourceCat: [],
@@ -38,34 +34,32 @@ export async function companyPageCode({
     },
   };
   const sortObject = {
-    sortBy: "created_at",
-    orderBy: "desc",
+    sortBy: 'created_at',
+    orderBy: 'desc',
   };
 
   const searchParams = new URLSearchParams(window.location.search);
-  const companySlug = searchParams.get("name");
+  const companySlug = searchParams.get('name');
 
   let userFollowingAndFavourite: UserFollowingAndFavourite | null = null;
   let xanoToken: string | null = null;
 
-  const relatedBusinessCards = qsa("[dev-target=related-business-card]");
-  const companyCards = qsa("[dev-target=company-card]");
-  const cardSkeleton = qsa("[dev-target=card-skeleton]");
-  const insightsSkeleton = qs("[dev-target=skeleton-insights]");
-  const companyDetails = qsa("[dev-target=company-details]");
+  const relatedBusinessCards = qsa('[dev-target=related-business-card]');
+  const companyCards = qsa('[dev-target=company-card]');
+  const cardSkeleton = qsa('[dev-target=card-skeleton]');
+  const insightsSkeleton = qs('[dev-target=skeleton-insights]');
+  const companyDetails = qsa('[dev-target=company-details]');
   const keyDocumentsCards = qsa(`[dev-target="key-documents-card"]`);
 
-  const insightSearchInput = qs<HTMLInputElement>("[dev-search-target]");
-  const insightFilterForm = qs<HTMLFormElement>("[dev-target=filter-form]");
-  const insightClearFilters = qs<HTMLFormElement>("[dev-target=clear-filters]");
-  const inputEvent = new Event("input", { bubbles: true, cancelable: true });
+  const insightSearchInput = qs<HTMLInputElement>('[dev-search-target]');
+  const insightFilterForm = qs<HTMLFormElement>('[dev-target=filter-form]');
+  const insightClearFilters = qs<HTMLFormElement>('[dev-target=clear-filters]');
+  const inputEvent = new Event('input', { bubbles: true, cancelable: true });
 
   const insightTemplate = qs(`[dev-template="insight-item"]`);
   const insightTagTemplate = qs(`[dev-template="insight-tag"]`);
   const checkboxItemTemplate = qs(`[dev-template="checkbox-item"]`);
-  const relatedBusinessItemTemplate = qs(
-    `[dev-template="related-business-item"]`
-  );
+  const relatedBusinessItemTemplate = qs(`[dev-template="related-business-item"]`);
 
   const allTabsTarget = qs(`[dev-target="insight-all"]`);
 
@@ -77,14 +71,12 @@ export async function companyPageCode({
 
   const paginationTemplate = qs(`[dev-target=pagination-wrapper]`);
 
-  const memberStackUserToken = localStorage.getItem("_ms-mid");
+  const memberStackUserToken = localStorage.getItem('_ms-mid');
   if (!memberStackUserToken) {
-    return console.error("No memberstack token");
+    return console.error('No memberstack token');
   }
 
-  const lsUserFollowingFavourite = localStorage.getItem(
-    "user-following-favourite"
-  );
+  const lsUserFollowingFavourite = localStorage.getItem('user-following-favourite');
   // const lsXanoAuthToken = localStorage.getItem("AuthToken");
   // if (lsXanoAuthToken) {
   //   xanoToken = lsXanoAuthToken;
@@ -94,7 +86,7 @@ export async function companyPageCode({
   }
 
   if (!companySlug) {
-    return console.error("add company name in the url eg /company/oracle");
+    return console.error('add company name in the url eg /company/oracle');
   }
 
   if (xanoToken) {
@@ -104,14 +96,12 @@ export async function companyPageCode({
   } else {
     await getXanoAccessToken(memberStackUserToken);
   }
-  lsUserFollowingFavourite
-    ? getUserFollowingAndFavourite()
-    : await getUserFollowingAndFavourite();
+  lsUserFollowingFavourite ? getUserFollowingAndFavourite() : await getUserFollowingAndFavourite();
   companyPageInit(companySlug);
 
   async function getXanoAccessToken(memberstackToken: string) {
     try {
-      const res = await xano_wmx.post("/auth-user", {
+      const res = await xano_wmx.post('/auth-user', {
         memberstack_token: memberstackToken,
       });
       const xanoAuthToken = res.getBody().authToken as string;
@@ -119,20 +109,17 @@ export async function companyPageCode({
       xano_individual_pages.setAuthToken(xanoAuthToken);
       return xanoAuthToken;
     } catch (error) {
-      console.log("getXanoAccessToken_error", error);
+      console.log('getXanoAccessToken_error', error);
       return null;
     }
   }
 
   async function getUserFollowingAndFavourite() {
     try {
-      const res = await xano_userFeed.get("/user-following-and-favourite");
+      const res = await xano_userFeed.get('/user-following-and-favourite');
       const followingAndFavourite = res.getBody() as UserFollowingAndFavourite;
       userFollowingAndFavourite = followingAndFavourite;
-      localStorage.setItem(
-        "user-following-favourite",
-        JSON.stringify(followingAndFavourite)
-      );
+      localStorage.setItem('user-following-favourite', JSON.stringify(followingAndFavourite));
 
       return followingAndFavourite;
     } catch (error) {
@@ -144,46 +131,26 @@ export async function companyPageCode({
   async function companyPageInit(companySlug: string) {
     getCompanyInsights(companySlug, {});
     getCompany(companySlug);
-    insightFilterForm.addEventListener("submit", (e) => {
+    insightFilterForm.addEventListener('submit', (e) => {
       e.preventDefault();
       e.stopPropagation();
     });
-    insightSearchInput.addEventListener("input", () => {
+    insightSearchInput.addEventListener('input', () => {
       searchObject.search = insightSearchInput.value;
       searchDebounce(companySlug);
     });
-    insightClearFilters.addEventListener("click", () => {
-      const checkedFilters = qsa<HTMLInputElement>(
-        "[dev-input-checkbox]:checked"
-      );
+    insightClearFilters.addEventListener('click', () => {
+      const checkedFilters = qsa<HTMLInputElement>('[dev-input-checkbox]:checked');
 
-      insightSearchInput.value = "";
+      insightSearchInput.value = '';
       insightSearchInput.dispatchEvent(inputEvent);
       checkedFilters.forEach((input) => {
         input.click();
       });
     });
-    getFilters(
-      "/company_type",
-      {},
-      "companyType",
-      filterCompanyTypeTarget,
-      companySlug
-    );
-    getFilters(
-      "/source_category",
-      {},
-      "sourceCat",
-      filterSourceCatTarget,
-      companySlug
-    );
-    getFilters(
-      "/technology_category",
-      {},
-      "techCat",
-      filterTechCatTarget,
-      companySlug
-    );
+    getFilters('/company_type', {}, 'companyType', filterCompanyTypeTarget, companySlug);
+    getFilters('/source_category', {}, 'sourceCat', filterSourceCatTarget, companySlug);
+    getFilters('/technology_category', {}, 'techCat', filterTechCatTarget, companySlug);
     // getFilters(
     //   "/line_of_business",
     //   {},
@@ -192,11 +159,11 @@ export async function companyPageCode({
     //   companySlug
     // );
     getFilters(
-      "/insight_classification",
+      '/insight_classification',
       {},
-      "insightClass",
+      'insightClass',
       filterInsightClassTarget,
-      companySlug
+      companySlug,
     );
     sortLogicInit(companySlug);
   }
@@ -204,7 +171,7 @@ export async function companyPageCode({
   async function getCompanyInsights(slug: string, payload: InsightPayload) {
     const { page = 0, perPage = 0, offset = 0 } = payload;
     try {
-      const res = await xano_individual_pages.get("/company_insights", {
+      const res = await xano_individual_pages.get('/company_insights', {
         slug,
         page,
         perPage,
@@ -214,21 +181,17 @@ export async function companyPageCode({
         filtering: searchObject,
       });
       const personInsightResponse = res.getBody() as PersonInsightResponse;
-      allTabsTarget.innerHTML = "";
+      allTabsTarget.innerHTML = '';
 
       paginationLogic(personInsightResponse, slug);
 
       userFollowingAndFavourite &&
-        initInsights(
-          personInsightResponse,
-          allTabsTarget,
-          userFollowingAndFavourite
-        );
+        initInsights(personInsightResponse, allTabsTarget, userFollowingAndFavourite);
       insightsSkeleton.remove();
-      console.log("personInsightResponse", personInsightResponse);
+      console.log('personInsightResponse', personInsightResponse);
       return personInsightResponse;
     } catch (error) {
-      console.log("getCompanyInsights_error", error);
+      console.log('getCompanyInsights_error', error);
       return null;
     }
   }
@@ -245,15 +208,15 @@ export async function companyPageCode({
   function sortLogicInit(companySlug: string) {
     const sortItems = qsa<HTMLLinkElement>(`[dev-target="sort"]`);
     sortItems.forEach((item) => {
-      item.addEventListener("click", () => {
+      item.addEventListener('click', () => {
         sortItems.forEach((sortItem) => {
-          sortItem.classList.remove("active");
+          sortItem.classList.remove('active');
         });
-        item.classList.add("active");
+        item.classList.add('active');
         const value = item.textContent;
         qs(`[dev-target=sorted-item-name]`).textContent = value;
-        const orderBy = item.getAttribute("dev-orderby");
-        const sortBy = item.getAttribute("dev-sortby");
+        const orderBy = item.getAttribute('dev-orderby');
+        const sortBy = item.getAttribute('dev-sortby');
 
         if (sortBy && orderBy) {
           sortObject.sortBy = sortBy;
@@ -267,139 +230,125 @@ export async function companyPageCode({
 
   async function getCompany(slug: string) {
     try {
-      const res = await xano_individual_pages.get("/company", {
+      const res = await xano_individual_pages.get('/company', {
         slug,
       });
       const company = res.getBody() as Company;
       if (company === null) {
-        window.location.href = "/404";
+        window.location.href = '/404';
         return null;
       }
-      qs("title").textContent = company.name;
-      console.log("company", company);
+      qs('title').textContent = company.name;
+      console.log('company', company);
       const aboutRichText = qs(`[dev-target="about-rich-text"]`);
       aboutRichText!.innerHTML = company.about;
 
       companyCards.forEach((companyCard) => {
         const location = companyCard.querySelector<HTMLDivElement>(
-          `[dev-target="location-wrapper"]`
+          `[dev-target="location-wrapper"]`,
         );
         const companySize = companyCard.querySelector<HTMLDivElement>(
-          `[dev-target="company-size-wrapper"]`
+          `[dev-target="company-size-wrapper"]`,
         );
         const businessEntity = companyCard.querySelector<HTMLDivElement>(
-          `[dev-target="business-entity-wrapper"]`
+          `[dev-target="business-entity-wrapper"]`,
         );
         const companyType = companyCard.querySelector<HTMLDivElement>(
-          `[dev-target="company-type-wrapper"]`
+          `[dev-target="company-type-wrapper"]`,
         );
         const companyRevenue = companyCard.querySelector<HTMLDivElement>(
-          `[dev-target="company-revenue-wrapper"]`
+          `[dev-target="company-revenue-wrapper"]`,
         );
         const fiscalYear = companyCard.querySelector<HTMLDivElement>(
-          `[dev-target="fiscal-year-wrapper"]`
+          `[dev-target="fiscal-year-wrapper"]`,
         );
 
         if (company.location) {
-          location!.querySelector("p")!.textContent = company.location;
+          location!.querySelector('p')!.textContent = company.location;
         } else {
-          location?.classList.add("hide");
+          location?.classList.add('hide');
         }
-        if (company["company-size"]) {
-          companySize!.querySelector("p")!.textContent =
-            company["company-size"];
+        if (company['company-size']) {
+          companySize!.querySelector('p')!.textContent = company['company-size'];
         } else {
-          companySize?.classList.add("hide");
+          companySize?.classList.add('hide');
         }
-        if (company["company-revenue"]) {
-          companyRevenue!.querySelector("p")!.textContent =
-            company["company-revenue"];
+        if (company['company-revenue']) {
+          companyRevenue!.querySelector('p')!.textContent = company['company-revenue'];
         } else {
-          companyRevenue?.classList.add("hide");
+          companyRevenue?.classList.add('hide');
         }
-        if (company["fiscal-year"]) {
-          fiscalYear!.querySelector("p")!.textContent = company["fiscal-year"];
+        if (company['fiscal-year']) {
+          fiscalYear!.querySelector('p')!.textContent = company['fiscal-year'];
         } else {
-          fiscalYear?.classList.add("hide");
+          fiscalYear?.classList.add('hide');
         }
         if (company.business_entity_details) {
-          businessEntity!.querySelector("p")!.textContent =
-            company.business_entity_details.name;
+          businessEntity!.querySelector('p')!.textContent = company.business_entity_details.name;
         } else {
-          businessEntity?.classList.add("hide");
+          businessEntity?.classList.add('hide');
         }
         if (company.company_type_details) {
-          companyType!.querySelector("p")!.textContent =
-            company.company_type_details.name;
+          companyType!.querySelector('p')!.textContent = company.company_type_details.name;
         } else {
-          companyType?.classList.add("hide");
+          companyType?.classList.add('hide');
         }
 
-        const companyName = companyCard.querySelector<HTMLHeadingElement>(
-          `[dev-target=company-name]`
-        );
+        const companyName =
+          companyCard.querySelector<HTMLHeadingElement>(`[dev-target=company-name]`);
         const companyLink = companyCard.querySelector<HTMLLinkElement>(
-          `[dev-target=company-website]`
+          `[dev-target=company-website]`,
         );
         const companyLinkedinLink = companyCard.querySelector<HTMLLinkElement>(
-          `[dev-target=linkedin-link]`
+          `[dev-target=linkedin-link]`,
         );
-        const companyImageWrapper = companyCard.querySelector(
-          `[dev-target=company-image-wrapper]`
-        );
+        const companyImageWrapper = companyCard.querySelector(`[dev-target=company-image-wrapper]`);
         // const companyImageLink =
         //   companyImageWrapper?.querySelector<HTMLLinkElement>(
         //     `[dev-target=company-picture-link]`
         //   );
-        const companyImage =
-          companyImageWrapper?.querySelector<HTMLImageElement>(
-            `[dev-target=company-image]`
-          );
-        const companyInput =
-          companyImageWrapper?.querySelector<HTMLInputElement>(
-            `[dev-target=company-input]`
-          );
+        const companyImage = companyImageWrapper?.querySelector<HTMLImageElement>(
+          `[dev-target=company-image]`,
+        );
+        const companyInput = companyImageWrapper?.querySelector<HTMLInputElement>(
+          `[dev-target=company-input]`,
+        );
 
-        companyLinkedinLink!.href = company["company-linkedin-profile-link"];
+        companyLinkedinLink!.href = company['company-linkedin-profile-link'];
         companyName!.textContent = company.name;
-        companyLink!.textContent = company["company-website"];
-        companyLink!.href = company["company-website"];
+        companyLink!.textContent = company['company-website'];
+        companyLink!.href = company['company-website'];
         if (company.company_logo) {
           companyImage!.src = company.company_logo.url;
         } else {
-          companyImage!.src = `https://logo.clearbit.com/${company["company-website"]}`;
-          fetch(
-            "https://logo.clearbit.com/" + company["company-website"]
-          ).catch(
+          companyImage!.src = `https://logo.clearbit.com/${company['company-website']}`;
+          fetch('https://logo.clearbit.com/' + company['company-website']).catch(
             () =>
               (companyImage!.src =
-                "https://uploads-ssl.webflow.com/64a2a18ba276228b93b991d7/64c7c26d6639a8e16ee7797f_Frame%20427318722.webp")
+                'https://uploads-ssl.webflow.com/64a2a18ba276228b93b991d7/64c7c26d6639a8e16ee7797f_Frame%20427318722.webp'),
           );
         }
-        companyCard.classList.remove("dev-hide");
+        companyCard.classList.remove('dev-hide');
 
         cardSkeleton.forEach((item) => item.remove());
 
         fakeCheckboxToggle(companyInput!);
-        companyInput?.setAttribute("dev-input-type", "company_id");
-        companyInput?.setAttribute("dev-input-id", company.id.toString());
+        companyInput?.setAttribute('dev-input-type', 'company_id');
+        companyInput?.setAttribute('dev-input-id', company.id.toString());
         companyInput && followFavouriteLogic(companyInput);
         companyInput &&
           setCheckboxesInitialState(
             companyInput,
-            convertArrayOfObjToNumber(
-              userFollowingAndFavourite!.user_following.company_id
-            )
+            convertArrayOfObjToNumber(userFollowingAndFavourite!.user_following.company_id),
           );
       });
 
       keyDocumentsCards.forEach((keyDocumentsCard) => {
-        const keyDocumentsItemTemplate =
-          keyDocumentsCard.querySelector<HTMLDivElement>(
-            `[dev-target="key-documents-template"]`
-          ) as HTMLDivElement;
+        const keyDocumentsItemTemplate = keyDocumentsCard.querySelector<HTMLDivElement>(
+          `[dev-target="key-documents-template"]`,
+        ) as HTMLDivElement;
         const keyDocumentsWrapper = keyDocumentsCard.querySelector(
-          `[dev-target="key-documents-wrapper"]`
+          `[dev-target="key-documents-wrapper"]`,
         );
         if (
           company.key_documents &&
@@ -408,13 +357,10 @@ export async function companyPageCode({
         ) {
           company.key_documents.forEach((keyDocument) => {
             if (keyDocument === null) return;
-            const keyDocumentItem = keyDocumentsItemTemplate.cloneNode(
-              true
-            ) as HTMLDivElement;
-            const keyDocumentItemLink =
-              keyDocumentItem.querySelector<HTMLLinkElement>(
-                `[dev-target="key-documents-link"]`
-              );
+            const keyDocumentItem = keyDocumentsItemTemplate.cloneNode(true) as HTMLDivElement;
+            const keyDocumentItemLink = keyDocumentItem.querySelector<HTMLLinkElement>(
+              `[dev-target="key-documents-link"]`,
+            );
             keyDocumentItemLink!.textContent = keyDocument.name;
             keyDocumentItemLink!.href = keyDocument.document
               ? keyDocument.document.url
@@ -422,64 +368,56 @@ export async function companyPageCode({
 
             keyDocumentsWrapper?.appendChild(keyDocumentItem);
           });
-          keyDocumentsCard
-            .querySelector(`[dev-target="empty-state"]`)
-            ?.classList.add("hide");
+          keyDocumentsCard.querySelector(`[dev-target="empty-state"]`)?.classList.add('hide');
         } else {
-          keyDocumentsCard
-            .querySelector(`[dev-target="empty-state"]`)
-            ?.classList.remove("hide");
-          keyDocumentsWrapper?.classList.add("hide");
+          keyDocumentsCard.querySelector(`[dev-target="empty-state"]`)?.classList.remove('hide');
+          keyDocumentsWrapper?.classList.add('hide');
         }
       });
 
       relatedBusinessCards.forEach((relatedBusinessCard) => {
         if (
-          (company["related-business-entities"] &&
-            company["related-business-entities"].length === 0) ||
-          company["related-business-entities"] === null
+          (company['related-business-entities'] &&
+            company['related-business-entities'].length === 0) ||
+          company['related-business-entities'] === null
         ) {
           relatedBusinessCard
             .querySelector(`[dev-target=related-business-empty-state]`)
-            ?.classList.remove("hide");
+            ?.classList.remove('hide');
         }
 
         if (
-          company["related-business-entities"] &&
-          company["related-business-entities"].length > 0 &&
-          company["related-business-entities"][0] !== null
+          company['related-business-entities'] &&
+          company['related-business-entities'].length > 0 &&
+          company['related-business-entities'][0] !== null
         ) {
-          company["related-business-entities"].forEach((item) => {
+          company['related-business-entities'].forEach((item) => {
             if (item === null) return;
             const relatedBusinessItem = relatedBusinessItemTemplate.cloneNode(
-              true
+              true,
             ) as HTMLDivElement;
             const name = relatedBusinessItem.querySelector(`[dev-target=name]`);
-            const description = relatedBusinessItem.querySelector(
-              `[dev-target=description]`
-            );
+            const description = relatedBusinessItem.querySelector(`[dev-target=description]`);
             const companyLink =
-              relatedBusinessItem.querySelector<HTMLLinkElement>(
-                `[dev-target=company-link]`
-              );
+              relatedBusinessItem.querySelector<HTMLLinkElement>(`[dev-target=company-link]`);
 
             name!.textContent = item.name;
-            description!.textContent = item["description-small"];
+            description!.textContent = item['description-small'];
             companyLink!.href = `${route}/company/` + item.slug;
 
             relatedBusinessCard
               .querySelector(`[dev-target=related-business-wrapper]`)
               ?.appendChild(relatedBusinessItem);
-            window.Webflow.require("ix2").init();
+            window.Webflow.require('ix2').init();
           });
         }
       });
 
-      companyDetails.forEach((item) => item.classList.remove("opacity-hide"));
+      companyDetails.forEach((item) => item.classList.remove('opacity-hide'));
 
       return company;
     } catch (error) {
-      console.log("getCompany_error", error);
+      console.log('getCompany_error', error);
       return null;
     }
   }
@@ -487,54 +425,40 @@ export async function companyPageCode({
   function initInsights(
     insights: PersonInsightResponse,
     target: HTMLDivElement,
-    userFollowingAndFavourite: UserFollowingAndFavourite
+    userFollowingAndFavourite: UserFollowingAndFavourite,
   ) {
     insights.items.forEach((insight) => {
       const newInsight = insightTemplate.cloneNode(true) as HTMLDivElement;
 
       const tagsWrapperTarget = newInsight.querySelector<HTMLDivElement>(
-        `[dev-target=tags-container]`
+        `[dev-target=tags-container]`,
       );
 
       const companyLink = newInsight.querySelector(`[dev-target=company-link]`);
-      const companyImage = newInsight.querySelector<HTMLImageElement>(
-        `[dev-target=company-image]`
-      );
-      const insightNameTarget = newInsight.querySelector(
-        `[dev-target=insight-name]`
-      );
+      const companyImage = newInsight.querySelector<HTMLImageElement>(`[dev-target=company-image]`);
+      const insightNameTarget = newInsight.querySelector(`[dev-target=insight-name]`);
       const insightLink = newInsight.querySelector(`[dev-target=insight-link]`);
       const curatedDateTargetWrapper = newInsight.querySelector(
-        `[dev-target="curated-date-wrapper"]`
+        `[dev-target="curated-date-wrapper"]`,
       );
-      const curatedDateTarget = newInsight.querySelector(
-        `[dev-target="curated-date"]`
-      );
+      const curatedDateTarget = newInsight.querySelector(`[dev-target="curated-date"]`);
       const publishedDateTargetWrapper = newInsight.querySelectorAll(
-        `[dev-target="published-date-wrapper"]`
+        `[dev-target="published-date-wrapper"]`,
       );
-      const publishedDateTarget = newInsight.querySelector(
-        `[dev-target="published-date"]`
-      );
+      const publishedDateTarget = newInsight.querySelector(`[dev-target="published-date"]`);
       const sourceTargetWrapper = newInsight.querySelector(
-        `[dev-target="source-name-link-wrapper"]`
+        `[dev-target="source-name-link-wrapper"]`,
       );
-      const sourceTarget = newInsight.querySelector(
-        `[dev-target="source-name-link"]`
-      );
+      const sourceTarget = newInsight.querySelector(`[dev-target="source-name-link"]`);
       const sourceAuthorTargetWrapper = newInsight.querySelectorAll(
-        `[dev-target="source-author-wrapper"]`
+        `[dev-target="source-author-wrapper"]`,
       );
-      const sourceAuthorTarget = newInsight.querySelector(
-        `[dev-target="source-author"]`
-      );
+      const sourceAuthorTarget = newInsight.querySelector(`[dev-target="source-author"]`);
 
-      const curatedDate = insight.curated
-        ? formatCuratedDate(insight.curated)
-        : "";
-      const publishedDate = insight["source-publication-date"]
-        ? formatPublishedDate(insight["source-publication-date"])
-        : "";
+      const curatedDate = insight.curated ? formatCuratedDate(insight.curated) : '';
+      const publishedDate = insight['source-publication-date']
+        ? formatPublishedDate(insight['source-publication-date'])
+        : '';
       const sourceCatArray = insight.source_category_id;
       const companyTypeArray = insight.company_type_id;
       const insightClassArray = insight.insight_classification_id;
@@ -542,20 +466,17 @@ export async function companyPageCode({
       const techCatArray = insight.technology_category_id;
 
       const companyInputs = newInsight.querySelectorAll<HTMLInputElement>(
-        `[dev-target=company-input]`
+        `[dev-target=company-input]`,
       );
       companyInputs.forEach((companyInput) => {
         fakeCheckboxToggle(companyInput!);
-        companyInput?.setAttribute("dev-input-type", "company_id");
+        companyInput?.setAttribute('dev-input-type', 'company_id');
         if (insight.company_id) {
-          companyInput?.setAttribute(
-            "dev-input-id",
-            insight.company_id.toString()
-          );
+          companyInput?.setAttribute('dev-input-id', insight.company_id.toString());
         } else {
-          const inputForm = companyInput.closest("form");
+          const inputForm = companyInput.closest('form');
           if (inputForm) {
-            inputForm.style.display = "none";
+            inputForm.style.display = 'none';
           }
         }
         // insight.company_id &&
@@ -567,26 +488,24 @@ export async function companyPageCode({
         companyInput &&
           setCheckboxesInitialState(
             companyInput,
-            convertArrayOfObjToNumber(
-              userFollowingAndFavourite.user_following.company_id
-            )
+            convertArrayOfObjToNumber(userFollowingAndFavourite.user_following.company_id),
           );
       });
       const favouriteInputs = newInsight.querySelectorAll<HTMLInputElement>(
-        `[dev-target=favourite-input]`
+        `[dev-target=favourite-input]`,
       );
       favouriteInputs.forEach((favouriteInput) => {
         fakeCheckboxToggle(favouriteInput!);
 
-        favouriteInput?.setAttribute("dev-input-type", "favourite");
-        favouriteInput?.setAttribute("dev-input-id", insight.id.toString());
+        favouriteInput?.setAttribute('dev-input-type', 'favourite');
+        favouriteInput?.setAttribute('dev-input-id', insight.id.toString());
 
         favouriteInput && followFavouriteLogic(favouriteInput);
 
         favouriteInput &&
           setCheckboxesInitialState(
             favouriteInput,
-            userFollowingAndFavourite.user_favourite.insight_id
+            userFollowingAndFavourite.user_favourite.insight_id,
           );
       });
 
@@ -594,92 +513,65 @@ export async function companyPageCode({
       addTagsToInsight(companyTypeArray, tagsWrapperTarget!, false);
       addTagsToInsight(insightClassArray, tagsWrapperTarget!, false);
       // addTagsToInsight(lineOfBusArray, tagsWrapperTarget!, false);
-      addTagsToInsight(
-        techCatArray,
-        tagsWrapperTarget!,
-        true,
-        "technology_category_id"
-      );
+      addTagsToInsight(techCatArray, tagsWrapperTarget!, true, 'technology_category_id');
 
       if (insight.company_details.company_logo) {
         companyImage!.src = insight.company_details.company_logo.url;
       } else {
         companyImage!.src =
-          "https://logo.clearbit.com/" +
-          insight.company_details["company-website"];
-        fetch(
-          "https://logo.clearbit.com/" +
-            insight.company_details["company-website"]
-        ).catch(
+          'https://logo.clearbit.com/' + insight.company_details['company-website'];
+        fetch('https://logo.clearbit.com/' + insight.company_details['company-website']).catch(
           () =>
             (companyImage!.src =
-              "https://uploads-ssl.webflow.com/64a2a18ba276228b93b991d7/64c7c26d6639a8e16ee7797f_Frame%20427318722.webp")
+              'https://uploads-ssl.webflow.com/64a2a18ba276228b93b991d7/64c7c26d6639a8e16ee7797f_Frame%20427318722.webp'),
         );
       }
       insightNameTarget!.textContent = insight.name;
-      curatedDateTargetWrapper?.classList[curatedDate ? "remove" : "add"](
-        "hide"
-      );
-      curatedDateTarget!.textContent = curatedDate ?? "";
-      publishedDateTarget!.textContent = publishedDate ?? "";
+      curatedDateTargetWrapper?.classList[curatedDate ? 'remove' : 'add']('hide');
+      curatedDateTarget!.textContent = curatedDate ?? '';
+      publishedDateTarget!.textContent = publishedDate ?? '';
       publishedDateTargetWrapper.forEach((item) =>
-        item.classList[publishedDate ? "remove" : "add"]("hide")
+        item.classList[publishedDate ? 'remove' : 'add']('hide'),
       );
-      insightLink!.setAttribute("href", `${route}/insight/` + insight.slug);
-      sourceTarget!.setAttribute("href", insight["source-url"]);
-      sourceTargetWrapper?.classList[insight["source-url"] ? "remove" : "add"](
-        "hide"
-      );
-      companyLink!.setAttribute(
-        "href",
-        `${route}/company/` + insight.company_details.slug
-      );
+      insightLink!.setAttribute('href', `${route}/insight/` + insight.slug);
+      sourceTarget!.setAttribute('href', insight['source-url']);
+      sourceTargetWrapper?.classList[insight['source-url'] ? 'remove' : 'add']('hide');
+      companyLink!.setAttribute('href', `${route}/company/` + insight.company_details.slug);
       sourceTarget!.textContent = insight.source;
       sourceAuthorTargetWrapper.forEach((item) =>
-        item.classList[insight.source_author ? "remove" : "add"]("hide")
+        item.classList[insight.source_author ? 'remove' : 'add']('hide'),
       );
       sourceAuthorTarget!.textContent = insight.source_author;
       target.appendChild(newInsight);
     });
   }
 
-  function paginationLogic(
-    insight: PersonInsightResponse,
-    companySlug: string
-  ) {
+  function paginationLogic(insight: PersonInsightResponse, companySlug: string) {
     const paginationTarget = qs(`[dev-target="all-tab-pagination_wrapper"]`);
 
     const { curPage, nextPage, prevPage, itemsReceived } = insight;
-    const paginationWrapper = paginationTarget.closest(
-      `[dev-target="insight-pagination-wrapper"]`
-    );
+    const paginationWrapper = paginationTarget.closest(`[dev-target="insight-pagination-wrapper"]`);
     const pagination = paginationTemplate.cloneNode(true) as HTMLDivElement;
     const prevBtn = pagination.querySelector(
-      `[dev-target=pagination-previous]`
+      `[dev-target=pagination-previous]`,
     ) as HTMLButtonElement;
-    const nextBtn = pagination.querySelector(
-      `[dev-target=pagination-next]`
-    ) as HTMLButtonElement;
+    const nextBtn = pagination.querySelector(`[dev-target=pagination-next]`) as HTMLButtonElement;
     const pageItemWrapper = pagination.querySelector(
-      `[dev-target=pagination-number-wrapper]`
+      `[dev-target=pagination-number-wrapper]`,
     ) as HTMLDivElement;
     // const pageItem = pagination
     //   .querySelector(`[dev-target=page-number-temp]`)
     //   ?.cloneNode(true) as HTMLButtonElement;
 
-    paginationTarget.innerHTML = "";
-    pageItemWrapper.innerHTML = "";
+    paginationTarget.innerHTML = '';
+    pageItemWrapper.innerHTML = '';
 
     if (itemsReceived === 0) {
-      paginationTarget?.classList.add("hide");
-      paginationWrapper
-        ?.querySelector(`[dev-tab-empty-state]`)
-        ?.classList.remove("hide");
+      paginationTarget?.classList.add('hide');
+      paginationWrapper?.querySelector(`[dev-tab-empty-state]`)?.classList.remove('hide');
     } else {
-      paginationTarget?.classList.remove("hide");
-      paginationWrapper
-        ?.querySelector(`[dev-tab-empty-state]`)
-        ?.classList.add("hide");
+      paginationTarget?.classList.remove('hide');
+      paginationWrapper?.querySelector(`[dev-tab-empty-state]`)?.classList.add('hide');
     }
 
     // if (pageTotal <= 6) {
@@ -774,31 +666,31 @@ export async function companyPageCode({
     //   pageItemWrapper.appendChild(pageNumItem);
     // }
 
-    prevBtn.classList[prevPage ? "remove" : "add"]("disabled");
-    nextBtn.classList[nextPage ? "remove" : "add"]("disabled");
+    prevBtn.classList[prevPage ? 'remove' : 'add']('disabled');
+    nextBtn.classList[nextPage ? 'remove' : 'add']('disabled');
 
     nextPage &&
-      nextBtn.addEventListener("click", () => {
+      nextBtn.addEventListener('click', () => {
         paginationWrapper?.scrollTo({
           top: 0,
-          behavior: "smooth",
+          behavior: 'smooth',
         });
         window.scrollTo({
           top: 0,
-          behavior: "smooth",
+          behavior: 'smooth',
         });
         getCompanyInsights(companySlug, { page: curPage + 1 });
         // getInsights(endPoint, { page: curPage + 1 }, tagTarget);
       });
     prevPage &&
-      prevBtn.addEventListener("click", () => {
+      prevBtn.addEventListener('click', () => {
         paginationWrapper?.scrollTo({
           top: 0,
-          behavior: "smooth",
+          behavior: 'smooth',
         });
         window.scrollTo({
           top: 0,
-          behavior: "smooth",
+          behavior: 'smooth',
         });
         getCompanyInsights(companySlug, { page: curPage - 1 });
         // getInsights(endPoint, { page: curPage - 1 }, tagTarget);
@@ -806,24 +698,21 @@ export async function companyPageCode({
     // pagination.style.display = pageTotal === 1 ? "none" : "flex";
 
     if (nextPage === null && prevPage === null) {
-      paginationTarget?.classList.add("hide");
+      paginationTarget?.classList.add('hide');
     }
     paginationTarget.appendChild(pagination);
   }
 
   function followFavouriteLogic(input: HTMLInputElement) {
-    input.addEventListener("change", async () =>
-      followFavouriteDebounce(input)
-    );
+    input.addEventListener('change', async () => followFavouriteDebounce(input));
   }
 
   const followFavouriteDebounce = debounce(followFavouriteListener, 300);
 
   async function followFavouriteListener(input: HTMLInputElement) {
-    const type = input.getAttribute("dev-input-type")!;
-    const id = input.getAttribute("dev-input-id")!;
-    const endPoint =
-      type === "favourite" ? "/toggle-favourite" : "/toggle-follow";
+    const type = input.getAttribute('dev-input-type')!;
+    const id = input.getAttribute('dev-input-id')!;
+    const endPoint = type === 'favourite' ? '/toggle-favourite' : '/toggle-follow';
     try {
       await xano_userFeed.get(endPoint, {
         id: Number(id),
@@ -843,20 +732,15 @@ export async function companyPageCode({
 
   async function getFilters(
     endPoint:
-      | "/company_type"
-      | "/insight_classification"
-      | "/line_of_business"
-      | "/source_category"
-      | "/technology_category",
+      | '/company_type'
+      | '/insight_classification'
+      | '/line_of_business'
+      | '/source_category'
+      | '/technology_category',
     payload: { page?: number; perPage?: number; offset?: number },
-    type:
-      | "companyType"
-      | "sourceCat"
-      | "techCat"
-      | "lineOfBus"
-      | "insightClass",
+    type: 'companyType' | 'sourceCat' | 'techCat' | 'lineOfBus' | 'insightClass',
     targetWrapper: HTMLDivElement,
-    companySlug: string
+    companySlug: string,
   ) {
     const { page = 0, perPage = 0, offset = 0 } = payload;
     try {
@@ -873,23 +757,20 @@ export async function companyPageCode({
       });
       const filters = res.getBody() as FilterResponse[];
       filters.forEach((filter) => {
-        const newFilter = checkboxItemTemplate.cloneNode(
-          true
-        ) as HTMLDivElement;
-        const input =
-          newFilter.querySelector<HTMLInputElement>("[dev-target=input]");
+        const newFilter = checkboxItemTemplate.cloneNode(true) as HTMLDivElement;
+        const input = newFilter.querySelector<HTMLInputElement>('[dev-target=input]');
         input && fakeCheckboxToggle(input);
-        input?.addEventListener("change", () => {
+        input?.addEventListener('change', () => {
           if (input.checked) {
             searchObject.checkboxes[type].push(filter.id);
           } else {
-            searchObject.checkboxes[type] = searchObject.checkboxes[
-              type
-            ].filter((item) => item != filter.id);
+            searchObject.checkboxes[type] = searchObject.checkboxes[type].filter(
+              (item) => item != filter.id,
+            );
           }
           searchDebounce(companySlug);
         });
-        newFilter.querySelector("[dev-target=name]")!.textContent = filter.name;
+        newFilter.querySelector('[dev-target=name]')!.textContent = filter.name;
         targetWrapper.appendChild(newFilter);
       });
       return filters;
@@ -901,41 +782,32 @@ export async function companyPageCode({
 
   function updateInsightsInputs(insight: HTMLDivElement) {
     const companyInputs = insight.querySelectorAll<HTMLInputElement>(
-      `[dev-input-type="company_id"]`
+      `[dev-input-type="company_id"]`,
     );
     companyInputs.forEach((companyInput) => {
       companyInput &&
         setCheckboxesInitialState(
           companyInput,
-          convertArrayOfObjToNumber(
-            userFollowingAndFavourite?.user_following.company_id!
-          )
+          convertArrayOfObjToNumber(userFollowingAndFavourite?.user_following.company_id!),
         );
     });
-    const favorites = insight.querySelectorAll<HTMLInputElement>(
-      `[dev-input="fav-insight"]`
-    );
+    const favorites = insight.querySelectorAll<HTMLInputElement>(`[dev-input="fav-insight"]`);
     favorites.forEach((favourite) => {
       favourite &&
-        setCheckboxesInitialState(
-          favourite,
-          userFollowingAndFavourite?.user_favourite.insight_id!
-        );
+        setCheckboxesInitialState(favourite, userFollowingAndFavourite?.user_favourite.insight_id!);
     });
     const tagInputs = insight.querySelectorAll<HTMLInputElement>(
-      `[dev-input-type="technology_category_id"]`
+      `[dev-input-type="technology_category_id"]`,
     );
 
     companyCards.forEach((companyCard) => {
       const pageCompanyInput = companyCard.querySelector<HTMLInputElement>(
-        `[dev-input-type="company_id"]`
+        `[dev-input-type="company_id"]`,
       );
       pageCompanyInput &&
         setCheckboxesInitialState(
           pageCompanyInput,
-          convertArrayOfObjToNumber(
-            userFollowingAndFavourite?.user_following.company_id!
-          )
+          convertArrayOfObjToNumber(userFollowingAndFavourite?.user_following.company_id!),
         );
     });
 
@@ -943,28 +815,21 @@ export async function companyPageCode({
       setCheckboxesInitialState(
         tag,
         convertArrayOfObjToNumber(
-          userFollowingAndFavourite?.user_following.technology_category_id!
-        )
+          userFollowingAndFavourite?.user_following.technology_category_id!,
+        ),
       );
     });
   }
 
-  function setCheckboxesInitialState(
-    input: HTMLInputElement,
-    slugArray: number[]
-  ) {
-    const inputId = input.getAttribute("dev-input-id");
+  function setCheckboxesInitialState(input: HTMLInputElement, slugArray: number[]) {
+    const inputId = input.getAttribute('dev-input-id');
 
     if (slugArray.includes(Number(inputId))) {
       input.checked = true;
-      input
-        .closest<HTMLDivElement>("[dev-fake-checkbox-wrapper]")
-        ?.classList.add("checked");
+      input.closest<HTMLDivElement>('[dev-fake-checkbox-wrapper]')?.classList.add('checked');
     } else {
       input.checked = false;
-      input
-        .closest<HTMLDivElement>("[dev-fake-checkbox-wrapper]")
-        ?.classList.remove("checked");
+      input.closest<HTMLDivElement>('[dev-fake-checkbox-wrapper]')?.classList.remove('checked');
     }
   }
 
@@ -980,54 +845,41 @@ export async function companyPageCode({
     )[],
     targetWrapper: HTMLDivElement,
     showCheckbox: boolean,
-    type?: "technology_category_id"
+    type?: 'technology_category_id',
   ) {
     tagArray.forEach((item) => {
-      if (typeof item === "object" && item !== null) {
+      if (typeof item === 'object' && item !== null) {
         const newTag = insightTagTemplate.cloneNode(true) as HTMLDivElement;
-        const tagCheckbox = newTag.querySelector<HTMLDivElement>(
-          `[dev-target=fake-checkbox]`
-        );
-        const tagInput = newTag.querySelector<HTMLInputElement>(
-          `[dev-target=tag-input]`
-        );
+        const tagCheckbox = newTag.querySelector<HTMLDivElement>(`[dev-target=fake-checkbox]`);
+        const tagInput = newTag.querySelector<HTMLInputElement>(`[dev-target=tag-input]`);
         showCheckbox && tagInput && fakeCheckboxToggle(tagInput);
-        showCheckbox &&
-          type &&
-          tagInput &&
-          tagInput.setAttribute("dev-input-type", type);
-        showCheckbox &&
-          tagInput &&
-          tagInput.setAttribute("dev-input-id", item.id.toString());
+        showCheckbox && type && tagInput && tagInput.setAttribute('dev-input-type', type);
+        showCheckbox && tagInput && tagInput.setAttribute('dev-input-id', item.id.toString());
         showCheckbox && tagInput && followFavouriteLogic(tagInput);
-        newTag.querySelector(`[dev-target=tag-name]`)!.textContent =
-          item?.name!;
+        newTag.querySelector(`[dev-target=tag-name]`)!.textContent = item?.name!;
 
         if (showCheckbox) {
-          const tagSpan = newTag.querySelector<HTMLSpanElement>(
-            `[dev-target="tag-name"]`
-          );
-          newTag.style.cursor = "pointer";
-          newTag.querySelector<HTMLLabelElement>(
-            `[dev-fake-checkbox-wrapper]`
-          )!.style.cursor = "pointer";
-          const anchor = document.createElement("a");
+          const tagSpan = newTag.querySelector<HTMLSpanElement>(`[dev-target="tag-name"]`);
+          newTag.style.cursor = 'pointer';
+          newTag.querySelector<HTMLLabelElement>(`[dev-fake-checkbox-wrapper]`)!.style.cursor =
+            'pointer';
+          const anchor = document.createElement('a');
           anchor.href = `${route}/technology/${item.slug}`;
           anchor.textContent = tagSpan!.textContent;
-          anchor.style.cursor = "pointer";
-          anchor.classList.add("tag-span-name");
+          anchor.style.cursor = 'pointer';
+          anchor.classList.add('tag-span-name');
           tagSpan?.replaceWith(anchor);
         }
 
         if (tagCheckbox && !showCheckbox) {
-          tagCheckbox.style.display = "none";
+          tagCheckbox.style.display = 'none';
         }
         if (showCheckbox && tagInput && userFollowingAndFavourite) {
           setCheckboxesInitialState(
             tagInput,
             convertArrayOfObjToNumber(
-              userFollowingAndFavourite?.user_following.technology_category_id
-            )
+              userFollowingAndFavourite?.user_following.technology_category_id,
+            ),
           );
         }
 
@@ -1038,18 +890,16 @@ export async function companyPageCode({
 
   function formatPublishedDate(inputDate: Date) {
     const date = new Date(inputDate);
-    return `${date.toLocaleString("default", {
-      month: "long",
+    return `${date.toLocaleString('default', {
+      month: 'long',
     })} ${date.getUTCDate()}, ${date.getFullYear()}`;
   }
 
   // Function to toggle fake checkboxes
   function fakeCheckboxToggle(input: HTMLInputElement) {
-    input.addEventListener("change", () => {
-      const inputWrapper = input.closest(
-        "[dev-fake-checkbox-wrapper]"
-      ) as HTMLDivElement;
-      inputWrapper.classList[input.checked ? "add" : "remove"]("checked");
+    input.addEventListener('change', () => {
+      const inputWrapper = input.closest('[dev-fake-checkbox-wrapper]') as HTMLDivElement;
+      inputWrapper.classList[input.checked ? 'add' : 'remove']('checked');
     });
   }
 

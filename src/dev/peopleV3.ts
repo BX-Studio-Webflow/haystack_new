@@ -1,5 +1,5 @@
-import { peoplePageCode } from "../../utils/peopleV3";
+import { peoplePageCode } from '../../utils/peopleV3';
 
-document.addEventListener("DOMContentLoaded", async () => {
-  peoplePageCode({ dataSource: "dev" });
+document.addEventListener('DOMContentLoaded', async () => {
+  peoplePageCode({ dataSource: 'dev' });
 });

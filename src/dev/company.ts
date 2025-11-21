@@ -1,5 +1,5 @@
-import { companyPageCode } from "../../utils/company";
+import { companyPageCode } from '../../utils/company';
 
-document.addEventListener("DOMContentLoaded", async () => {
-  companyPageCode({ dataSource: "dev" });
+document.addEventListener('DOMContentLoaded', async () => {
+  companyPageCode({ dataSource: 'dev' });
 });

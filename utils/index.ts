@@ -8,42 +8,38 @@ export function debounce(func: (...args: any[]) => void, delay: number) {
 }
 
 // Function for querying a single element by selector
-export function qs<T extends HTMLElement = HTMLDivElement>(
-  selector: string
-): T {
+export function qs<T extends HTMLElement = HTMLDivElement>(selector: string): T {
   return document.querySelector(selector) as T;
 }
 
 // Function for querying multiple elements by selector
-export function qsa<T extends HTMLElement = HTMLDivElement>(
-  selector: string
-): NodeListOf<T> {
+export function qsa<T extends HTMLElement = HTMLDivElement>(selector: string): NodeListOf<T> {
   return document.querySelectorAll(selector) as NodeListOf<T>;
 }
 
 export function formatCuratedDate(inputDate: Date) {
   const months = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December',
   ];
   const date = new Date(inputDate);
   const month = date.getMonth();
   const year = date.getFullYear();
   const day = date.getDate();
-  return `${months[month]} ${day.toString().padStart(2, "0")}, ${year}`;
+  return `${months[month]} ${day.toString().padStart(2, '0')}, ${year}`;
 }
 export function toSentenceCase(str: string) {
-  if (!str) return "";
+  if (!str) return '';
   str = str.toLowerCase();
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
@@ -57,10 +53,10 @@ export function toTitleCase(str: string) {
 export function slugify(text: string): string {
   return text
     .toLowerCase()
-    .normalize("NFD") // Normalize accented characters
-    .replace(/[\u0300-\u036f]/g, "") // Remove diacritics
-    .replace(/[^a-z0-9\s-]/g, "") // Remove non-alphanumeric characters
+    .normalize('NFD') // Normalize accented characters
+    .replace(/[\u0300-\u036f]/g, '') // Remove diacritics
+    .replace(/[^a-z0-9\s-]/g, '') // Remove non-alphanumeric characters
     .trim() // Remove leading/trailing whitespace
-    .replace(/[\s_-]+/g, "-") // Replace spaces and underscores with dashes
-    .replace(/^-+|-+$/g, ""); // Remove leading/trailing dashes
+    .replace(/[\s_-]+/g, '-') // Replace spaces and underscores with dashes
+    .replace(/^-+|-+$/g, ''); // Remove leading/trailing dashes
 }
