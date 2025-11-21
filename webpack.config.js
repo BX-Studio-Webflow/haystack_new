@@ -131,7 +131,9 @@ const getEntryPoints = () => {
   const entry = {};
   tsFiles.forEach((file) => {
     const relativePath = path.relative(srcDir, file);
-    const name = path.relative(srcDir, file).replace(/\.ts$/, "");
+    const name = path.relative(srcDir, file)
+      .replace(/\.ts$/, "")
+      .replace(/[\\/]/g, "_"); // replace slashes
     const entryPath = path.resolve(srcDir, relativePath);
     entry[name] = entryPath;
   });
