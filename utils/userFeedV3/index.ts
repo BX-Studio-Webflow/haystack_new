@@ -495,6 +495,12 @@ export async function userFeedCode({
         const curatedDateTarget = newInsight.querySelector(
           `[dev-target="curated-date"]`
         );
+        const curatedCompanyTargetWrapper = newInsight.querySelector(
+          `[dev-target="curated-company-wrapper"]`
+        );
+        const curatedCompanyTarget = newInsight.querySelector(
+          `[dev-target="curated-company"]`
+        );
         const publishedDateTargetWrapper = newInsight.querySelectorAll(
           `[dev-target="published-date-wrapper"]`
         );
@@ -562,7 +568,7 @@ export async function userFeedCode({
               searchResultList!.appendChild(newSearchResultItem);
             });
           }
-          userFeedType!.textContent = "insight";
+          //userFeedType!.textContent = "insight";
           newInsight.setAttribute("dev-target", "insight-feed-item");
           const curatedDate = data.curated
             ? formatCuratedDate(data.curated)
@@ -686,6 +692,10 @@ export async function userFeedCode({
             data.name,
             searchObject.search
           );
+          curatedCompanyTargetWrapper?.classList[data.company_details?.slug ? "remove" : "add"](
+            "hide"
+          );
+          curatedCompanyTarget!.textContent = data.company_details?.name ?? "";
           curatedDateTargetWrapper?.classList[curatedDate ? "remove" : "add"](
             "hide"
           );
