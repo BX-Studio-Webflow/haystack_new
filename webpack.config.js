@@ -133,7 +133,7 @@ const getEntryPoints = () => {
     const relativePath = path.relative(srcDir, file);
     const name = path.relative(srcDir, file)
       .replace(/\.ts$/, "")
-      .replace(/[\\/]/g, "_"); // replace slashes
+      .replace(/[\\/]/g, "/"); // replace slashes
     const entryPath = path.resolve(srcDir, relativePath);
     entry[name] = entryPath;
   });
