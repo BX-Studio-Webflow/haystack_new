@@ -167,5 +167,20 @@ module.exports = {
     splitChunks: false, // Disable code splitting
     // minimize: false,
   },
+  devServer: {
+    static: {
+      directory: path.resolve(__dirname, "dist"),
+    },
+    compress: true,
+    hot: true,
+    port: 8080,
+    open: false,
+    allowedHosts: "all",
+    headers: {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "GET, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type",
+    },
+  },
   mode: "production", // or 'development' based on your needs
 };
