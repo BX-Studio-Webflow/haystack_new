@@ -432,9 +432,9 @@ export async function userFeedCode({
           if (countDiv) {
             return (countDiv.textContent = this.feedSearch.value
               ? `(${Object.values(mergedData.totalReturnTypeCount).reduce(
-                  (acc, value) => acc + value,
-                  0
-                )})`
+                (acc, value) => acc + value,
+                0
+              )})`
               : "");
           }
         }
@@ -553,9 +553,8 @@ export async function userFeedCode({
               const searchResultText = newSearchResultItem.querySelector(
                 "[dev-template-text]"
               ) as HTMLDivElement;
-              searchResultCount!.textContent = `${
-                searchList.indexOf(item) + 1
-              }`;
+              searchResultCount!.textContent = `${searchList.indexOf(item) + 1
+                }`;
               searchResultText.innerHTML = highlightQueryInText(
                 item,
                 searchObject.search
@@ -725,8 +724,8 @@ export async function userFeedCode({
           if (searchListWrap) searchListWrap.style.display = "none";
           if (searchTextDiv) searchTextDiv.style.display = "none";
 
-          userFeedType!.textContent = "company";
-          userFeedType!.classList.add("company");
+          //userFeedType!.textContent = "company";
+          //userFeedType!.classList.add("company");
           insightNameTarget!.innerHTML = highlightQueryInText(
             data.name,
             searchObject.search
@@ -833,8 +832,8 @@ export async function userFeedCode({
           );
 
           newInsight.setAttribute("dev-target", "people-feed-item");
-          userFeedType!.textContent = "person";
-          userFeedType!.classList.add("person");
+          //userFeedType!.textContent = "person";
+          //userFeedType!.classList.add("person");
           insightLink!.setAttribute("href", `${route}/person/` + data.slug);
           companyLink!.setAttribute("href", `${route}/person/` + data.slug);
           const peopleInputs = newInsight.querySelectorAll<HTMLInputElement>(
@@ -1426,10 +1425,10 @@ export async function userFeedCode({
     tagArray: (
       | 0
       | {
-          id: number;
-          name: string;
-          slug: string;
-        }
+        id: number;
+        name: string;
+        slug: string;
+      }
       | null
     )[],
     targetWrapper: HTMLDivElement,
