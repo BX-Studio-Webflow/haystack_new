@@ -567,7 +567,7 @@ export async function userFeedCode({
               searchResultList!.appendChild(newSearchResultItem);
             });
           }
-          //userFeedType!.textContent = "insight";
+          if (userFeedType) { userFeedType!.textContent = "insight"; }
           newInsight.setAttribute("dev-target", "insight-feed-item");
           const curatedDate = data.curated
             ? formatCuratedDate(data.curated)
@@ -724,8 +724,10 @@ export async function userFeedCode({
           if (searchListWrap) searchListWrap.style.display = "none";
           if (searchTextDiv) searchTextDiv.style.display = "none";
 
-          //userFeedType!.textContent = "company";
-          //userFeedType!.classList.add("company");
+          if (userFeedType) {
+            userFeedType!.textContent = "company";
+            userFeedType!.classList.add("company");
+          }
           insightNameTarget!.innerHTML = highlightQueryInText(
             data.name,
             searchObject.search
@@ -832,8 +834,10 @@ export async function userFeedCode({
           );
 
           newInsight.setAttribute("dev-target", "people-feed-item");
-          //userFeedType!.textContent = "person";
-          //userFeedType!.classList.add("person");
+          if (userFeedType) {
+            userFeedType!.textContent = "person";
+            userFeedType!.classList.add("person");
+          }
           insightLink!.setAttribute("href", `${route}/person/` + data.slug);
           companyLink!.setAttribute("href", `${route}/person/` + data.slug);
           const peopleInputs = newInsight.querySelectorAll<HTMLInputElement>(
