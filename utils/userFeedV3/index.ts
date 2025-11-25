@@ -199,7 +199,7 @@ export async function userFeedCode({
         "[dev-target=feed-sort-wrap]"
       ) as HTMLDivElement;
       this.filtersWrap = this.contentItem.querySelector(
-        "[dev-filter-wrap]"
+        "[dev-filter-category]"
       ) as HTMLDivElement;
       this.feedSearch = this.contentItem.querySelector(
         "[dev-target=user-feed-search]"
