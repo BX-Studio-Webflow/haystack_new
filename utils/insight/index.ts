@@ -88,6 +88,9 @@ export async function insightPageCode({
       const shareInput = shareForm?.querySelector<HTMLInputElement>(
         "[dev-target=share-input]"
       );
+      const shareInputMessage = shareForm?.querySelector<HTMLInputElement>(
+        "[dev-target=share-input-message]"
+      );
       const shareError = shareForm?.querySelector<HTMLDivElement>(
         "[dev-target=share-error]"
       );
@@ -153,6 +156,7 @@ export async function insightPageCode({
         e.stopPropagation();
         shareSubmit.classList.add("is-disabled");
         const shareInputValue = shareInput.value;
+        const shareInputMessageValue = shareInputMessage?.value;
         const invalidMails = getInvalidEmails(
           shareInputValue.split(",").map((item) => item.trim())
         );
@@ -163,6 +167,7 @@ export async function insightPageCode({
         } else {
           const shareData = await shareInsight({
             emails: shareInputValue,
+            message: shareInputMessageValue || '',
             insightSlug,
             origin: window.location.origin,
           });
@@ -204,16 +209,19 @@ export async function insightPageCode({
 
   async function shareInsight({
     emails,
+    message,
     insightSlug,
     origin,
   }: {
     origin: string;
     emails: string;
+    message: string;
     insightSlug: string;
   }) {
     try {
       const res = await xano_shared_insight_pages.post("/share_insight", {
         emails,
+        message,
         insightSlug,
         origin,
       });
@@ -370,11 +378,11 @@ export async function insightPageCode({
           insight.company_details["company-website"];
         fetch(
           "https://logo.clearbit.com/" +
-            insight.company_details["company-website"]
+          insight.company_details["company-website"]
         ).catch(
           () =>
-            (companyImage!.src =
-              "https://uploads-ssl.webflow.com/64a2a18ba276228b93b991d7/64c7c26d6639a8e16ee7797f_Frame%20427318722.webp")
+          (companyImage!.src =
+            "https://uploads-ssl.webflow.com/64a2a18ba276228b93b991d7/64c7c26d6639a8e16ee7797f_Frame%20427318722.webp")
         );
       }
       curatedDateTargetWrapper?.classList[curatedDate ? "remove" : "add"](
@@ -450,8 +458,8 @@ export async function insightPageCode({
                 "https://logo.clearbit.com/" + item["company-website"]
               ).catch(
                 () =>
-                  (companyImage!.src =
-                    "https://uploads-ssl.webflow.com/64a2a18ba276228b93b991d7/64c7c26d6639a8e16ee7797f_Frame%20427318722.webp")
+                (companyImage!.src =
+                  "https://uploads-ssl.webflow.com/64a2a18ba276228b93b991d7/64c7c26d6639a8e16ee7797f_Frame%20427318722.webp")
               );
             }
             companyPictureLink!.href = `${route}/company/` + item.slug;
@@ -536,9 +544,8 @@ export async function insightPageCode({
               `[dev-target="company-link"]`
             );
             const personTitleName = person.title;
-            const personName = `${person.name}${
-              personTitleName && ", " + truncateText(personTitleName, 30)
-            }`;
+            const personName = `${person.name}${personTitleName && ", " + truncateText(personTitleName, 30)
+              }`;
             const personLink = `${route}/person/` + person.slug;
             const companyName = person._company?.name;
             const companyLink = `${route}/company/` + person._company?.slug;
@@ -649,10 +656,10 @@ export async function insightPageCode({
     tagArray: (
       | 0
       | {
-          id: number;
-          name: string;
-          slug: string;
-        }
+        id: number;
+        name: string;
+        slug: string;
+      }
       | null
     )[],
     targetWrapper: HTMLDivElement,
