@@ -250,6 +250,11 @@ export async function userFeedCode({
         ],
         this
       );
+      console.log(
+        'renderCustomTabs',
+        this.name
+      );
+
     }
 
     async lsInit() {
@@ -994,28 +999,95 @@ export async function userFeedCode({
       this.tabContainerContent = tabContainer.querySelector(
         "[dev-target=custom-tab_content]"
       ) as HTMLDivElement;
-      this.tabContainerMenu.innerHTML = "";
+      //this.tabContainerMenu.innerHTML = "";
       this.tabContainerContent.innerHTML = "";
+
+
     }
 
+
+
+
     addTab(tab: Tab): void {
+
       this.tabs.push(tab);
       this.tabs[0].tabIsActive(true);
       tab.menuItem.addEventListener("click", (e) => {
+        console.log(
+          'tab.menuItem.addEventListener',
+          e.target
+        );
+
         this.tabs.forEach((tab) => {
           if (e.target === tab.menuItem) {
             tab.tabIsActive(true);
             this.activeTab = tab;
+            console.log({ activeTab: this.activeTab });
+
+            const tabs = [allTab, followingTab, favouriteTab];
+            const renderCustomTabs = (activeTabName: string) => {
+              const template = this.activeTab?.contentItem.querySelector(
+                "[dev-target='custom-tab_menu_wrap']"
+              ) as HTMLDivElement | null;
+              const templateParent = template?.parentElement;
+
+              if (!template || !templateParent) {
+                return;
+              }
+
+              while (templateParent.firstChild) {
+                templateParent.removeChild(templateParent.firstChild);
+              }
+
+              tabs.forEach((tab) => {
+                console.log({ template });
+                const clone = template.firstElementChild?.cloneNode(
+                  true
+                ) as HTMLDivElement | null;
+                if (!clone) {
+                  return;
+                }
+                const tg_text = clone.querySelector(
+                  "[dev-target='menu-text']"
+                ) as HTMLDivElement;
+                if (tg_text) {
+                  tg_text.textContent = tab.name;
+                }
+                if (tab.name === activeTabName) {
+                  clone.classList.add("active");
+                }
+                clone.addEventListener("click", () => {
+                  renderCustomTabs(tab.name);
+                  tab.menuItem.click();
+                });
+                templateParent.appendChild(clone);
+              });
+            };
+            renderCustomTabs(this.activeTab?.name ?? allTab.name);
+
+
+
+
+
+
           } else {
             tab.tabIsActive(false);
           }
         });
+
+
+        //render custom tabs on the active tab afresh 
+
+
+
+
       });
       this.tabContainerMenu.appendChild(tab.menuItem);
       this.tabContainerContent.appendChild(tab.contentItem);
       if (!this.activeTab) {
         this.activeTab = tab;
       }
+
     }
 
     // getActiveTabItems(): Item[] {
@@ -1114,6 +1186,36 @@ export async function userFeedCode({
   customTab.addTab(allTab);
   customTab.addTab(followingTab);
   customTab.addTab(favouriteTab);
+
+  const tabContainer = qs<HTMLDivElement>("[dev-target='custom-tab_menu_wrap']");
+  const tabTemplate = tabContainer?.firstElementChild?.cloneNode(true) as
+    | HTMLDivElement
+    | undefined;
+
+  if (tabContainer && tabTemplate) {
+    const tabs = [allTab, followingTab, favouriteTab];
+    const renderCustomTabs = (activeTabName: string) => {
+      tabContainer.innerHTML = "";
+      tabs.forEach((tab) => {
+        const clone = tabTemplate.cloneNode(true) as HTMLDivElement;
+        const tg_text = clone.querySelector(
+          "[dev-target='menu-text']"
+        ) as HTMLDivElement;
+        if (tg_text) {
+          tg_text.textContent = tab.name;
+        }
+        if (tab.name === activeTabName) {
+          clone.classList.add("active");
+        }
+        clone.addEventListener("click", () => {
+          renderCustomTabs(tab.name);
+          tab.menuItem.click();
+        });
+        tabContainer.appendChild(clone);
+      });
+    };
+    renderCustomTabs(allTab.name);
+  }
 
   if (xanoToken) {
     xano_userFeed.setAuthToken(xanoToken);
