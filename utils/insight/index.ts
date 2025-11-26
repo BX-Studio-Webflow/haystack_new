@@ -500,7 +500,7 @@ export async function insightPageCode({
             const header = companyCard.querySelector(`[dev-target="companies-accordion-header"]`) as HTMLElement
             if (header) {
               header.classList.add('is-disabled')
-              addTippyAttributes(companyCard, 'No companies found')
+              addTippyAttributes(companyCard, 'No companies mentioned yet')
             }
           });
           companyWrapper?.classList.add("hide");
@@ -542,7 +542,7 @@ export async function insightPageCode({
         if (header) {
           header.classList.add('is-disabled')
           //add tippy attributes
-          addTippyAttributes(sourceDocumentCard, 'No source documents found')
+          addTippyAttributes(sourceDocumentCard, 'No source documents mentioned yet')
         }
 
       }
@@ -592,7 +592,7 @@ export async function insightPageCode({
             const header = peopleCard.querySelector(`[dev-target="people-accordion-header"]`) as HTMLElement
             if (header) {
               header.classList.add('is-disabled')
-              addTippyAttributes(peopleCard, 'No people found')
+              addTippyAttributes(peopleCard, 'No people mentioned yet')
             }
           });
           peopleWrapper?.classList.add("hide");
@@ -624,7 +624,7 @@ export async function insightPageCode({
             const header = eventWrapper.querySelector(`[dev-target="event-accordion-header"]`) as HTMLElement
             if (header) {
               header.classList.add('is-disabled')
-              addTippyAttributes(eventCard, 'No events found')
+              addTippyAttributes(eventCard, 'No events mentioned yet')
             }
           });
           eventWrapper?.classList.add("hide");
