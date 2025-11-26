@@ -486,11 +486,15 @@ export async function insightPageCode({
               ?.classList.add("hide")
           );
         } else {
-          companyCards.forEach((companyCard) =>
+          companyCards.forEach((companyCard) => {
             companyCard
               .querySelector(`[dev-target="empty-state"]`)
               ?.classList.remove("hide")
-          );
+            const header = companyCard.querySelector(`[dev-target="companies-accordion-header"]`) as HTMLElement
+            if (header) {
+              header.classList.add('is-disabled')
+            }
+          });
           companyWrapper?.classList.add("hide");
         }
       });
@@ -520,10 +524,17 @@ export async function insightPageCode({
           .querySelector(`[dev-target="empty-state"]`)
           ?.classList.add("hide");
       } else {
+        console.log('no source documents')
         sourceDocumentCard
           .querySelector(`[dev-target="empty-state"]`)
           ?.classList.remove("hide");
         sourceDocumentWrapper?.classList.add("hide");
+
+        const header = sourceDocumentCard.querySelector(`[dev-target="source-accordion-header"]`) as HTMLElement
+        if (header) {
+          header.classList.add('is-disabled')
+        }
+
       }
 
       const peopleWrappers = Array.from(peopleCards).map(
