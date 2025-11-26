@@ -164,6 +164,7 @@ export async function userFeedCode({
     sortContainer: HTMLDivElement;
     menuItem: HTMLDivElement;
     filterModalTrigger: HTMLDivElement;
+    followModalTrigger: HTMLDivElement;
     contentItem: HTMLDivElement;
     feedSearch: HTMLInputElement;
     feedSearchLoader: HTMLInputElement;
@@ -188,6 +189,9 @@ export async function userFeedCode({
       this.contentItem = contentItemTemplate.cloneNode(true) as HTMLDivElement;
       this.filterModalTrigger = this.contentItem.querySelector(
         `[dev-target=filter-modal-trigger]`
+      ) as HTMLDivElement;
+      this.followModalTrigger = this.contentItem.querySelector(
+        `[dev-target=follow-modal-trigger]`
       ) as HTMLDivElement;
       this.sortContainer = this.contentItem.querySelector(
         `[dev-target=custom-dropdown_wrap]`
@@ -221,6 +225,9 @@ export async function userFeedCode({
       this.contentItem.classList["remove"]("active");
       this.filterModalTrigger.addEventListener("click", () => {
         qs(`[dev-target=filter-modal-target]`).click();
+      });
+      this.followModalTrigger.addEventListener("click", () => {
+        qs(`[dev-target=follow-modal-target]`).click();
       });
       this.filterWrapInit();
       this.lsInit();
