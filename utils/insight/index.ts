@@ -247,6 +247,13 @@ export async function insightPageCode({
     }
   }
 
+  const addTippyAttributes = (element: HTMLElement, content: string) => {
+    element.setAttribute('data-tippy-content', content)
+    element.setAttribute('data-tippy-placement', 'left')
+    element.setAttribute('data-tippy-arrow', 'true')
+    element.setAttribute('data-tippy-duration', '300')
+  }
+
   async function insightPageInit(insightSlug: string) {
     const insight = await getInsight(insightSlug);
     if (insight) {
@@ -493,6 +500,7 @@ export async function insightPageCode({
             const header = companyCard.querySelector(`[dev-target="companies-accordion-header"]`) as HTMLElement
             if (header) {
               header.classList.add('is-disabled')
+              addTippyAttributes(companyCard, 'No companies found')
             }
           });
           companyWrapper?.classList.add("hide");
@@ -533,6 +541,8 @@ export async function insightPageCode({
         const header = sourceDocumentCard.querySelector(`[dev-target="source-accordion-header"]`) as HTMLElement
         if (header) {
           header.classList.add('is-disabled')
+          //add tippy attributes
+          addTippyAttributes(sourceDocumentCard, 'No source documents found')
         }
 
       }
@@ -582,6 +592,7 @@ export async function insightPageCode({
             const header = peopleCard.querySelector(`[dev-target="people-accordion-header"]`) as HTMLElement
             if (header) {
               header.classList.add('is-disabled')
+              addTippyAttributes(peopleCard, 'No people found')
             }
           });
           peopleWrapper?.classList.add("hide");
@@ -613,6 +624,7 @@ export async function insightPageCode({
             const header = eventWrapper.querySelector(`[dev-target="event-accordion-header"]`) as HTMLElement
             if (header) {
               header.classList.add('is-disabled')
+              addTippyAttributes(eventCard, 'No events found')
             }
           });
           eventWrapper?.classList.add("hide");
