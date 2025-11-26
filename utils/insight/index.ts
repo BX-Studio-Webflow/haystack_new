@@ -565,11 +565,14 @@ export async function insightPageCode({
               ?.classList.add("hide")
           );
         } else {
-          peopleCards.forEach((peopleCard) =>
+          peopleCards.forEach((peopleCard) => {
             peopleCard
-              .querySelector(`[dev-target="empty-state"]`)
-              ?.classList.remove("hide")
-          );
+              .querySelector(`[dev-target="empty-state"]`)?.remove()
+            const header = peopleCard.querySelector(`[dev-target="people-accordion-header"]`) as HTMLElement
+            if (header) {
+              header.classList.add('is-disabled')
+            }
+          });
           peopleWrapper?.classList.add("hide");
         }
       });
@@ -592,11 +595,15 @@ export async function insightPageCode({
               ?.classList.add("hide")
           );
         } else {
-          eventCards.forEach((eventCard) =>
+          eventCards.forEach((eventCard) => {
             eventCard
               .querySelector(`[dev-target="empty-state"]`)
               ?.classList.remove("hide")
-          );
+            const header = eventWrapper.querySelector(`[dev-target="event-accordion-header"]`) as HTMLElement
+            if (header) {
+              header.classList.add('is-disabled')
+            }
+          });
           eventWrapper?.classList.add("hide");
         }
       });
