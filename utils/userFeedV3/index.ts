@@ -579,7 +579,7 @@ export async function userFeedCode({
               searchResultList!.appendChild(newSearchResultItem);
             });
           }
-          if (userFeedType) { userFeedType!.textContent = "insight"; }
+
           newInsight.setAttribute("dev-target", "insight-feed-item");
           const curatedDate = data.curated
             ? formatCuratedDate(data.curated)
