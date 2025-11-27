@@ -257,10 +257,7 @@ export async function userFeedCode({
         ],
         this
       );
-      console.log(
-        'renderCustomTabs',
-        this.name
-      );
+     
 
     }
 
