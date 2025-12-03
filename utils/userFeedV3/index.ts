@@ -257,7 +257,7 @@ export async function userFeedCode({
         ],
         this
       );
-     
+
 
     }
 
@@ -1159,7 +1159,9 @@ export async function userFeedCode({
 
   const memberStackUserToken = localStorage.getItem("_ms-mid");
   if (!memberStackUserToken) {
-    return console.error("No memberstack token");
+    console.error("No memberstack token");
+    window.location.href = "/login?error=unauthorized";
+    return;
   }
 
   const lsUserFollowingFavourite = localStorage.getItem(

@@ -61,7 +61,9 @@ export async function insightPageCode({
 
   const memberStackUserToken = localStorage.getItem("_ms-mid");
   if (!memberStackUserToken) {
-    return console.error("No memberstack token");
+    console.error("No memberstack token");
+    window.location.href = "/login?error=unauthorized";
+    return;
   }
 
   if (xanoToken) {
