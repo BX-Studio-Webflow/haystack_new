@@ -167,19 +167,29 @@ export async function insightPageCode({
           shareError.textContent = `Invalid mail(s) ${invalidMails.join()}`;
           toggleError({ errorDiv: shareError, value: false });
         } else {
-          const shareData = await shareInsight({
-            emails: shareInputValue,
-            message: shareInputMessageValue || '',
-            insightSlug,
-            origin: window.location.origin,
+          console.log({ shareInputValue });
+          //split email by comma and for each email, send a amail
+          let shareData: string[] = [];
+          const emails = shareInputValue.split(",");
+          emails.forEach(async (email) => {
+            const share = await shareInsight({
+              emails: email.trim(),
+              message: shareInputMessageValue || '',
+              insightSlug,
+              origin: window.location.origin,
+            });
+            if (share) {
+              shareData.push(share[0].shared_to);
+            }
           });
+
           if (shareData && shareData.length > 0) {
             shareList.innerHTML = "";
             shareData.map((share) => {
               const shareItem = shareItemPlaceholder.cloneNode(
                 true
               ) as HTMLDivElement;
-              shareItem.textContent = share.shared_to;
+              shareItem.textContent = share;
               shareList.appendChild(shareItem);
             });
             shareListWrap.setAttribute("dev-hide", "false");
