@@ -151,7 +151,7 @@ export async function insightPageCode({
           shareShowMore.setAttribute("dev-hide", "false");
         }
       }
-      console.log({ userShares });
+     
 
       shareForm.addEventListener("submit", async (e) => {
         e.preventDefault();
@@ -167,28 +167,46 @@ export async function insightPageCode({
           shareError.textContent = `Invalid mail(s) ${invalidMails.join()}`;
           toggleError({ errorDiv: shareError, value: false });
         } else {
-          console.log({ shareInputValue });
-          //split email by comma and for each email, send a amail
-          let shareData: string[] = [];
+
+          //split email by comma and for each email, send a mail
+          const shareDataSet = new Set<string>();
           const emails = shareInputValue.split(",");
-          emails.forEach(async (email) => {
+
+          // Get existing shares to merge with new ones
+          const existingShares = await getUserShares({ insightSlug });
+          if (existingShares && existingShares.length > 0) {
+            existingShares.forEach((share) => {
+              shareDataSet.add(share.shared_to);
+            });
+          }
+
+          // Share to each email and collect all unique shares
+          for (const email of emails) {
             const share = await shareInsight({
               emails: email.trim(),
               message: shareInputMessageValue || '',
               insightSlug,
               origin: window.location.origin,
             });
-            if (share) {
-              shareData.push(share[0].shared_to);
+        
+            if (share && share.length > 0) {
+              share.forEach((item) => {
+                shareDataSet.add(item.shared_to);
+              });
             }
-          });
+          }
+
+          const shareData = Array.from(shareDataSet);
+
 
           if (shareData && shareData.length > 0) {
+
             shareList.innerHTML = "";
-            shareData.map((share) => {
+            shareData.forEach((share) => {
               const shareItem = shareItemPlaceholder.cloneNode(
                 true
               ) as HTMLDivElement;
+
               shareItem.textContent = share;
               shareList.appendChild(shareItem);
             });
@@ -199,7 +217,7 @@ export async function insightPageCode({
         }
         shareSubmit.classList.remove("is-disabled");
 
-        console.log({ value: shareInput.value, insightSlug });
+
       });
     });
 
