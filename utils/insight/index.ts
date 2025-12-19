@@ -202,6 +202,8 @@ export async function insightPageCode({
         console.log({ value: shareInput.value, insightSlug });
       });
     });
+
+
   }
 
   function toggleError({
@@ -644,6 +646,23 @@ export async function insightPageCode({
       });
 
       insightTemplate.classList.remove("hide-template");
+
+
+
+      const figure = document.querySelector('figure.table') as HTMLElement;
+      console.log('figure', figure)
+      if (figure) {
+        console.log('setting height')
+        const topOffset = figure.getBoundingClientRect().top + window.scrollY;
+        figure.style.height = `calc(100vh - ${topOffset}px)`;
+      }
+      window.addEventListener('resize', () => {
+        if (figure) {
+          console.log('setting height on resize')
+          const topOffset = figure.getBoundingClientRect().top + window.scrollY;
+          figure.style.height = `calc(100vh - ${topOffset}px)`;
+        }
+      });
     }
   }
 
@@ -870,4 +889,6 @@ export async function insightPageCode({
   // ): NodeListOf<T> {
   //   return document.querySelectorAll(selector) as NodeListOf<T>;
   // }
+
+
 }
