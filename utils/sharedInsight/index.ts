@@ -378,12 +378,31 @@ export async function sharedInsightPageCode({
               eventCard
                 .querySelector(`[dev-target="empty-state"]`)
                 ?.classList.remove("hide")
+                
             );
             eventWrapper?.classList.add("hide");
           }
         });
 
         insightTemplate.classList.remove("hide-template");
+
+        //TABLE CODE
+        const figure = document.querySelector('figure.table') as HTMLElement;
+        console.log('figure', figure)
+        if (figure) {
+          console.log('setting height')
+          const topOffset = figure.getBoundingClientRect().top + window.scrollY;
+          figure.style.height = `calc(100vh - ${topOffset}px)`;
+        }
+        window.addEventListener('resize', () => {
+          if (figure) {
+            console.log('setting height on resize')
+            const topOffset = figure.getBoundingClientRect().top + window.scrollY;
+            figure.style.height = `calc(100vh - ${topOffset}px)`;
+          }
+        });
+
+
       } else {
         throw new Error("No insight returned");
       }
@@ -476,6 +495,14 @@ export async function sharedInsightPageCode({
     });
   }
 
+  const addTippyAttributes = (element: HTMLElement, content: string) => {
+    element.setAttribute('data-tippy-content', content)
+    element.setAttribute('data-tippy-placement', 'left')
+    element.setAttribute('data-tippy-arrow', 'true')
+    element.setAttribute('data-tippy-duration', '300')
+  }
+
+
   function formatPublishedDate(inputDate: Date) {
     const date = new Date(inputDate);
     return `${date.toLocaleString("default", {
@@ -509,6 +536,8 @@ export async function sharedInsightPageCode({
       customTooltip.style.left = `${left}px`;
       customTooltip.style.top = `${top}px`;
     });
+
+    
 
     document.addEventListener("mouseout", function (event) {
       if (
