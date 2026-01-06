@@ -672,7 +672,10 @@ export async function insightPageCode({
       const constant = 70; // px
 
       function setTableHeight() {
-        if (!figure) return;
+        if (!figure) {
+          console.log("no figure");
+          return;
+        };
 
         // Distance from top of viewport (ignores page scroll)
         const rect = figure.getBoundingClientRect();
