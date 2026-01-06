@@ -151,7 +151,6 @@ export async function insightPageCode({
           shareShowMore.setAttribute("dev-hide", "false");
         }
       }
-     
 
       shareForm.addEventListener("submit", async (e) => {
         e.preventDefault();
@@ -167,7 +166,6 @@ export async function insightPageCode({
           shareError.textContent = `Invalid mail(s) ${invalidMails.join()}`;
           toggleError({ errorDiv: shareError, value: false });
         } else {
-
           //split email by comma and for each email, send a mail
           const shareDataSet = new Set<string>();
           const emails = shareInputValue.split(",");
@@ -184,11 +182,11 @@ export async function insightPageCode({
           for (const email of emails) {
             const share = await shareInsight({
               emails: email.trim(),
-              message: shareInputMessageValue || '',
+              message: shareInputMessageValue || "",
               insightSlug,
               origin: window.location.origin,
             });
-        
+
             if (share && share.length > 0) {
               share.forEach((item) => {
                 shareDataSet.add(item.shared_to);
@@ -198,9 +196,7 @@ export async function insightPageCode({
 
           const shareData = Array.from(shareDataSet);
 
-
           if (shareData && shareData.length > 0) {
-
             shareList.innerHTML = "";
             shareData.forEach((share) => {
               const shareItem = shareItemPlaceholder.cloneNode(
@@ -216,12 +212,8 @@ export async function insightPageCode({
           toggleError({ errorDiv: shareError, value: true });
         }
         shareSubmit.classList.remove("is-disabled");
-
-
       });
     });
-
-
   }
 
   function toggleError({
@@ -280,11 +272,11 @@ export async function insightPageCode({
   }
 
   const addTippyAttributes = (element: HTMLElement, content: string) => {
-    element.setAttribute('data-tippy-content', content)
-    element.setAttribute('data-tippy-placement', 'left')
-    element.setAttribute('data-tippy-arrow', 'true')
-    element.setAttribute('data-tippy-duration', '300')
-  }
+    element.setAttribute("data-tippy-content", content);
+    element.setAttribute("data-tippy-placement", "left");
+    element.setAttribute("data-tippy-arrow", "true");
+    element.setAttribute("data-tippy-duration", "300");
+  };
 
   async function insightPageInit(insightSlug: string) {
     const insight = await getInsight(insightSlug);
@@ -417,11 +409,11 @@ export async function insightPageCode({
           insight.company_details["company-website"];
         fetch(
           "https://logo.clearbit.com/" +
-          insight.company_details["company-website"]
+            insight.company_details["company-website"]
         ).catch(
           () =>
-          (companyImage!.src =
-            "https://uploads-ssl.webflow.com/64a2a18ba276228b93b991d7/64c7c26d6639a8e16ee7797f_Frame%20427318722.webp")
+            (companyImage!.src =
+              "https://uploads-ssl.webflow.com/64a2a18ba276228b93b991d7/64c7c26d6639a8e16ee7797f_Frame%20427318722.webp")
         );
       }
       curatedDateTargetWrapper?.classList[curatedDate ? "remove" : "add"](
@@ -497,8 +489,8 @@ export async function insightPageCode({
                 "https://logo.clearbit.com/" + item["company-website"]
               ).catch(
                 () =>
-                (companyImage!.src =
-                  "https://uploads-ssl.webflow.com/64a2a18ba276228b93b991d7/64c7c26d6639a8e16ee7797f_Frame%20427318722.webp")
+                  (companyImage!.src =
+                    "https://uploads-ssl.webflow.com/64a2a18ba276228b93b991d7/64c7c26d6639a8e16ee7797f_Frame%20427318722.webp")
               );
             }
             companyPictureLink!.href = `${route}/company/` + item.slug;
@@ -528,11 +520,13 @@ export async function insightPageCode({
           companyCards.forEach((companyCard) => {
             companyCard
               .querySelector(`[dev-target="empty-state"]`)
-              ?.classList.remove("hide")
-            const header = companyCard.querySelector(`[dev-target="companies-accordion-header"]`) as HTMLElement
+              ?.classList.remove("hide");
+            const header = companyCard.querySelector(
+              `[dev-target="companies-accordion-header"]`
+            ) as HTMLElement;
             if (header) {
-              header.classList.add('is-disabled')
-              addTippyAttributes(companyCard, 'No companies mentioned yet')
+              header.classList.add("is-disabled");
+              addTippyAttributes(companyCard, "No companies mentioned yet");
             }
           });
           companyWrapper?.classList.add("hide");
@@ -564,19 +558,23 @@ export async function insightPageCode({
           .querySelector(`[dev-target="empty-state"]`)
           ?.classList.add("hide");
       } else {
-        console.log('no source documents')
+        console.log("no source documents");
         sourceDocumentCard
           .querySelector(`[dev-target="empty-state"]`)
           ?.classList.remove("hide");
         sourceDocumentWrapper?.classList.add("hide");
 
-        const header = sourceDocumentCard.querySelector(`[dev-target="source-accordion-header"]`) as HTMLElement
+        const header = sourceDocumentCard.querySelector(
+          `[dev-target="source-accordion-header"]`
+        ) as HTMLElement;
         if (header) {
-          header.classList.add('is-disabled')
+          header.classList.add("is-disabled");
           //add tippy attributes
-          addTippyAttributes(sourceDocumentCard, 'No source documents mentioned yet')
+          addTippyAttributes(
+            sourceDocumentCard,
+            "No source documents mentioned yet"
+          );
         }
-
       }
 
       const peopleWrappers = Array.from(peopleCards).map(
@@ -597,8 +595,9 @@ export async function insightPageCode({
               `[dev-target="company-link"]`
             );
             const personTitleName = person.title;
-            const personName = `${person.name}${personTitleName && ", " + truncateText(personTitleName, 30)
-              }`;
+            const personName = `${person.name}${
+              personTitleName && ", " + truncateText(personTitleName, 30)
+            }`;
             const personLink = `${route}/person/` + person.slug;
             const companyName = person._company?.name;
             const companyLink = `${route}/company/` + person._company?.slug;
@@ -619,12 +618,13 @@ export async function insightPageCode({
           );
         } else {
           peopleCards.forEach((peopleCard) => {
-            peopleCard
-              .querySelector(`[dev-target="empty-state"]`)?.remove()
-            const header = peopleCard.querySelector(`[dev-target="people-accordion-header"]`) as HTMLElement
+            peopleCard.querySelector(`[dev-target="empty-state"]`)?.remove();
+            const header = peopleCard.querySelector(
+              `[dev-target="people-accordion-header"]`
+            ) as HTMLElement;
             if (header) {
-              header.classList.add('is-disabled')
-              addTippyAttributes(peopleCard, 'No people mentioned yet')
+              header.classList.add("is-disabled");
+              addTippyAttributes(peopleCard, "No people mentioned yet");
             }
           });
           peopleWrapper?.classList.add("hide");
@@ -652,11 +652,13 @@ export async function insightPageCode({
           eventCards.forEach((eventCard) => {
             eventCard
               .querySelector(`[dev-target="empty-state"]`)
-              ?.classList.remove("hide")
-            const header = eventWrapper.querySelector(`[dev-target="event-accordion-header"]`) as HTMLElement
+              ?.classList.remove("hide");
+            const header = eventWrapper.querySelector(
+              `[dev-target="event-accordion-header"]`
+            ) as HTMLElement;
             if (header) {
-              header.classList.add('is-disabled')
-              addTippyAttributes(eventCard, 'No events mentioned yet')
+              header.classList.add("is-disabled");
+              addTippyAttributes(eventCard, "No events mentioned yet");
             }
           });
           eventWrapper?.classList.add("hide");
@@ -665,22 +667,33 @@ export async function insightPageCode({
 
       insightTemplate.classList.remove("hide-template");
 
+      // TABLE CODE
+      const figure = document.querySelector("figure.table") as HTMLElement;
+      const constant = 70; // px
 
+      function setTableHeight() {
+        if (!figure) return;
 
-      const figure = document.querySelector('figure.table') as HTMLElement;
-      console.log('figure', figure)
-      if (figure) {
-        console.log('setting height')
-        const topOffset = figure.getBoundingClientRect().top + window.scrollY;
-        figure.style.height = `calc(100vh - ${topOffset}px)`;
+        // Distance from top of viewport (ignores page scroll)
+        const rect = figure.getBoundingClientRect();
+        const topOffsetFromViewport = rect.top;
+
+        // Remaining height in viewport minus constant
+        const height = `calc(100vh - ${topOffsetFromViewport}px - ${constant}px)`;
+
+        Object.assign(figure.style, {
+          height: height,
+          marginBottom: "20px",
+          overflow: "auto",
+        });
+        console.log("Setting table height:", height);
       }
-      window.addEventListener('resize', () => {
-        if (figure) {
-          console.log('setting height on resize')
-          const topOffset = figure.getBoundingClientRect().top + window.scrollY;
-          figure.style.height = `calc(100vh - ${topOffset}px)`;
-        }
-      });
+
+      // Initial set
+      setTableHeight();
+
+      // Update on resize
+      window.addEventListener("resize", setTableHeight);
     }
   }
 
@@ -735,10 +748,10 @@ export async function insightPageCode({
     tagArray: (
       | 0
       | {
-        id: number;
-        name: string;
-        slug: string;
-      }
+          id: number;
+          name: string;
+          slug: string;
+        }
       | null
     )[],
     targetWrapper: HTMLDivElement,
@@ -907,6 +920,4 @@ export async function insightPageCode({
   // ): NodeListOf<T> {
   //   return document.querySelectorAll(selector) as NodeListOf<T>;
   // }
-
-
 }

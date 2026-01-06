@@ -378,31 +378,39 @@ export async function sharedInsightPageCode({
               eventCard
                 .querySelector(`[dev-target="empty-state"]`)
                 ?.classList.remove("hide")
-                
             );
             eventWrapper?.classList.add("hide");
           }
         });
 
         insightTemplate.classList.remove("hide-template");
+        // TABLE CODE
+        const figure = document.querySelector("figure.table") as HTMLElement;
+        const constant = 250; // px
 
-        //TABLE CODE
-        const figure = document.querySelector('figure.table') as HTMLElement;
-        console.log('figure', figure)
-        if (figure) {
-          console.log('setting height')
-          const topOffset = figure.getBoundingClientRect().top + window.scrollY;
-          figure.style.height = `calc(100vh - ${topOffset}px)`;
+        function setTableHeight() {
+          if (!figure) return;
+
+          // Distance from top of viewport (ignores page scroll)
+          const rect = figure.getBoundingClientRect();
+          const topOffsetFromViewport = rect.top;
+
+          // Remaining height in viewport minus constant
+          const height = `calc(100vh - ${topOffsetFromViewport}px - ${constant}px)`;
+
+          Object.assign(figure.style, {
+            height: height,
+            marginBottom: "20px",
+            overflow: "auto",
+          });
+          console.log("Setting table height:", height);
         }
-        window.addEventListener('resize', () => {
-          if (figure) {
-            console.log('setting height on resize')
-            const topOffset = figure.getBoundingClientRect().top + window.scrollY;
-            figure.style.height = `calc(100vh - ${topOffset}px)`;
-          }
-        });
 
+        // Initial set
+        setTableHeight();
 
+        // Update on resize
+        window.addEventListener("resize", setTableHeight);
       } else {
         throw new Error("No insight returned");
       }
@@ -496,12 +504,11 @@ export async function sharedInsightPageCode({
   }
 
   const addTippyAttributes = (element: HTMLElement, content: string) => {
-    element.setAttribute('data-tippy-content', content)
-    element.setAttribute('data-tippy-placement', 'left')
-    element.setAttribute('data-tippy-arrow', 'true')
-    element.setAttribute('data-tippy-duration', '300')
-  }
-
+    element.setAttribute("data-tippy-content", content);
+    element.setAttribute("data-tippy-placement", "left");
+    element.setAttribute("data-tippy-arrow", "true");
+    element.setAttribute("data-tippy-duration", "300");
+  };
 
   function formatPublishedDate(inputDate: Date) {
     const date = new Date(inputDate);
@@ -536,8 +543,6 @@ export async function sharedInsightPageCode({
       customTooltip.style.left = `${left}px`;
       customTooltip.style.top = `${top}px`;
     });
-
-    
 
     document.addEventListener("mouseout", function (event) {
       if (
