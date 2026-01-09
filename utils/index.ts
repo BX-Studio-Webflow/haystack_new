@@ -37,9 +37,9 @@ export function formatCuratedDate(inputDate: Date) {
     "December",
   ];
   const date = new Date(inputDate);
-  const month = date.getMonth();
-  const year = date.getFullYear();
-  const day = date.getDate();
+  const month = date.getUTCMonth();
+  const year = date.getUTCFullYear();
+  const day = date.getUTCDate();
   return `${months[month]} ${day.toString().padStart(2, "0")}, ${year}`;
 }
 export function toSentenceCase(str: string) {
