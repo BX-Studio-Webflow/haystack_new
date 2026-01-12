@@ -164,6 +164,7 @@ export async function userFeedCode({
     sortContainer: HTMLDivElement;
     menuItem: HTMLDivElement;
     filterModalTrigger: HTMLDivElement;
+    followModalTrigger: HTMLDivElement;
     contentItem: HTMLDivElement;
     feedSearch: HTMLInputElement;
     feedSearchLoader: HTMLInputElement;
@@ -189,6 +190,9 @@ export async function userFeedCode({
       this.filterModalTrigger = this.contentItem.querySelector(
         `[dev-target=filter-modal-trigger]`
       ) as HTMLDivElement;
+      this.followModalTrigger = this.contentItem.querySelector(
+        `[dev-target=follow-modal-trigger]`
+      ) as HTMLDivElement;
       this.sortContainer = this.contentItem.querySelector(
         `[dev-target=custom-dropdown_wrap]`
       ) as HTMLDivElement;
@@ -199,7 +203,7 @@ export async function userFeedCode({
         "[dev-target=feed-sort-wrap]"
       ) as HTMLDivElement;
       this.filtersWrap = this.contentItem.querySelector(
-        "[dev-filter-wrap]"
+        "[dev-filter-category]"
       ) as HTMLDivElement;
       this.feedSearch = this.contentItem.querySelector(
         "[dev-target=user-feed-search]"
@@ -221,6 +225,9 @@ export async function userFeedCode({
       this.contentItem.classList["remove"]("active");
       this.filterModalTrigger.addEventListener("click", () => {
         qs(`[dev-target=filter-modal-target]`).click();
+      });
+      this.followModalTrigger.addEventListener("click", () => {
+        qs(`[dev-target=follow-modal-target]`).click();
       });
       this.filterWrapInit();
       this.lsInit();
@@ -250,6 +257,8 @@ export async function userFeedCode({
         ],
         this
       );
+
+
     }
 
     async lsInit() {
@@ -432,9 +441,9 @@ export async function userFeedCode({
           if (countDiv) {
             return (countDiv.textContent = this.feedSearch.value
               ? `(${Object.values(mergedData.totalReturnTypeCount).reduce(
-                  (acc, value) => acc + value,
-                  0
-                )})`
+                (acc, value) => acc + value,
+                0
+              )})`
               : "");
           }
         }
@@ -495,6 +504,12 @@ export async function userFeedCode({
         const curatedDateTarget = newInsight.querySelector(
           `[dev-target="curated-date"]`
         );
+        const curatedCompanyTargetWrapper = newInsight.querySelector(
+          `[dev-target="curated-company-wrapper"]`
+        );
+        const curatedCompanyTarget = newInsight.querySelector(
+          `[dev-target="curated-company"]`
+        );
         const publishedDateTargetWrapper = newInsight.querySelectorAll(
           `[dev-target="published-date-wrapper"]`
         );
@@ -547,9 +562,8 @@ export async function userFeedCode({
               const searchResultText = newSearchResultItem.querySelector(
                 "[dev-template-text]"
               ) as HTMLDivElement;
-              searchResultCount!.textContent = `${
-                searchList.indexOf(item) + 1
-              }`;
+              searchResultCount!.textContent = `${searchList.indexOf(item) + 1
+                }`;
               searchResultText.innerHTML = highlightQueryInText(
                 item,
                 searchObject.search
@@ -562,7 +576,7 @@ export async function userFeedCode({
               searchResultList!.appendChild(newSearchResultItem);
             });
           }
-          userFeedType!.textContent = "insight";
+
           newInsight.setAttribute("dev-target", "insight-feed-item");
           const curatedDate = data.curated
             ? formatCuratedDate(data.curated)
@@ -686,6 +700,10 @@ export async function userFeedCode({
             data.name,
             searchObject.search
           );
+          curatedCompanyTargetWrapper?.classList[data.company_details?.slug ? "remove" : "add"](
+            "hide"
+          );
+          curatedCompanyTarget!.textContent = data.company_details?.name ?? "";
           curatedDateTargetWrapper?.classList[curatedDate ? "remove" : "add"](
             "hide"
           );
@@ -715,8 +733,10 @@ export async function userFeedCode({
           if (searchListWrap) searchListWrap.style.display = "none";
           if (searchTextDiv) searchTextDiv.style.display = "none";
 
-          userFeedType!.textContent = "company";
-          userFeedType!.classList.add("company");
+          if (userFeedType) {
+            userFeedType!.textContent = "company";
+            userFeedType!.classList.add("company");
+          }
           insightNameTarget!.innerHTML = highlightQueryInText(
             data.name,
             searchObject.search
@@ -823,8 +843,10 @@ export async function userFeedCode({
           );
 
           newInsight.setAttribute("dev-target", "people-feed-item");
-          userFeedType!.textContent = "person";
-          userFeedType!.classList.add("person");
+          if (userFeedType) {
+            userFeedType!.textContent = "person";
+            userFeedType!.classList.add("person");
+          }
           insightLink!.setAttribute("href", `${route}/person/` + data.slug);
           companyLink!.setAttribute("href", `${route}/person/` + data.slug);
           const peopleInputs = newInsight.querySelectorAll<HTMLInputElement>(
@@ -981,28 +1003,95 @@ export async function userFeedCode({
       this.tabContainerContent = tabContainer.querySelector(
         "[dev-target=custom-tab_content]"
       ) as HTMLDivElement;
-      this.tabContainerMenu.innerHTML = "";
+      //this.tabContainerMenu.innerHTML = "";
       this.tabContainerContent.innerHTML = "";
+
+
     }
 
+
+
+
     addTab(tab: Tab): void {
+
       this.tabs.push(tab);
       this.tabs[0].tabIsActive(true);
       tab.menuItem.addEventListener("click", (e) => {
+        console.log(
+          'tab.menuItem.addEventListener',
+          e.target
+        );
+
         this.tabs.forEach((tab) => {
           if (e.target === tab.menuItem) {
             tab.tabIsActive(true);
             this.activeTab = tab;
+            console.log({ activeTab: this.activeTab });
+
+            const tabs = [allTab, followingTab, favouriteTab];
+            const renderCustomTabs = (activeTabName: string) => {
+              const template = this.activeTab?.contentItem.querySelector(
+                "[dev-target='custom-tab_menu_wrap']"
+              ) as HTMLDivElement | null;
+              const templateParent = template?.parentElement;
+
+              if (!template || !templateParent) {
+                return;
+              }
+
+              while (templateParent.firstChild) {
+                templateParent.removeChild(templateParent.firstChild);
+              }
+
+              tabs.forEach((tab) => {
+                console.log({ template });
+                const clone = template.firstElementChild?.cloneNode(
+                  true
+                ) as HTMLDivElement | null;
+                if (!clone) {
+                  return;
+                }
+                const tg_text = clone.querySelector(
+                  "[dev-target='menu-text']"
+                ) as HTMLDivElement;
+                if (tg_text) {
+                  tg_text.textContent = tab.name;
+                }
+                if (tab.name === activeTabName) {
+                  clone.classList.add("active");
+                }
+                clone.addEventListener("click", () => {
+                  renderCustomTabs(tab.name);
+                  tab.menuItem.click();
+                });
+                templateParent.appendChild(clone);
+              });
+            };
+            renderCustomTabs(this.activeTab?.name ?? allTab.name);
+
+
+
+
+
+
           } else {
             tab.tabIsActive(false);
           }
         });
+
+
+        //render custom tabs on the active tab afresh 
+
+
+
+
       });
       this.tabContainerMenu.appendChild(tab.menuItem);
       this.tabContainerContent.appendChild(tab.contentItem);
       if (!this.activeTab) {
         this.activeTab = tab;
       }
+
     }
 
     // getActiveTabItems(): Item[] {
@@ -1070,7 +1159,9 @@ export async function userFeedCode({
 
   const memberStackUserToken = localStorage.getItem("_ms-mid");
   if (!memberStackUserToken) {
-    return console.error("No memberstack token");
+    console.error("No memberstack token");
+    window.location.href = "/login?error=unauthorized";
+    return;
   }
 
   const lsUserFollowingFavourite = localStorage.getItem(
@@ -1101,6 +1192,36 @@ export async function userFeedCode({
   customTab.addTab(allTab);
   customTab.addTab(followingTab);
   customTab.addTab(favouriteTab);
+
+  const tabContainer = qs<HTMLDivElement>("[dev-target='custom-tab_menu_wrap']");
+  const tabTemplate = tabContainer?.firstElementChild?.cloneNode(true) as
+    | HTMLDivElement
+    | undefined;
+
+  if (tabContainer && tabTemplate) {
+    const tabs = [allTab, followingTab, favouriteTab];
+    const renderCustomTabs = (activeTabName: string) => {
+      tabContainer.innerHTML = "";
+      tabs.forEach((tab) => {
+        const clone = tabTemplate.cloneNode(true) as HTMLDivElement;
+        const tg_text = clone.querySelector(
+          "[dev-target='menu-text']"
+        ) as HTMLDivElement;
+        if (tg_text) {
+          tg_text.textContent = tab.name;
+        }
+        if (tab.name === activeTabName) {
+          clone.classList.add("active");
+        }
+        clone.addEventListener("click", () => {
+          renderCustomTabs(tab.name);
+          tab.menuItem.click();
+        });
+        tabContainer.appendChild(clone);
+      });
+    };
+    renderCustomTabs(allTab.name);
+  }
 
   if (xanoToken) {
     xano_userFeed.setAuthToken(xanoToken);
@@ -1416,10 +1537,10 @@ export async function userFeedCode({
     tagArray: (
       | 0
       | {
-          id: number;
-          name: string;
-          slug: string;
-        }
+        id: number;
+        name: string;
+        slug: string;
+      }
       | null
     )[],
     targetWrapper: HTMLDivElement,

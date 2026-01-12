@@ -61,7 +61,9 @@ export async function insightPageCode({
 
   const memberStackUserToken = localStorage.getItem("_ms-mid");
   if (!memberStackUserToken) {
-    return console.error("No memberstack token");
+    console.error("No memberstack token");
+    window.location.href = "/login?error=unauthorized";
+    return;
   }
 
   if (xanoToken) {
@@ -88,6 +90,9 @@ export async function insightPageCode({
       const shareInput = shareForm?.querySelector<HTMLInputElement>(
         "[dev-target=share-input]"
       );
+      const shareInputMessage = shareForm?.querySelector<HTMLInputElement>(
+        "[dev-target=share-input-message]"
+      );
       const shareError = shareForm?.querySelector<HTMLDivElement>(
         "[dev-target=share-error]"
       );
@@ -106,16 +111,7 @@ export async function insightPageCode({
       const shareItemPlaceholder = shareCard?.querySelector<HTMLDivElement>(
         "[dev-target=share-item-placeholder]"
       );
-      console.log({
-        shareForm,
-        shareInput,
-        shareError,
-        shareListWrap,
-        shareList,
-        shareItemPlaceholder,
-        shareSubmit,
-        shareShowMore,
-      });
+
       if (
         !shareForm ||
         !shareInput ||
@@ -146,13 +142,13 @@ export async function insightPageCode({
           shareShowMore.setAttribute("dev-hide", "false");
         }
       }
-      console.log({ userShares });
 
       shareForm.addEventListener("submit", async (e) => {
         e.preventDefault();
         e.stopPropagation();
         shareSubmit.classList.add("is-disabled");
         const shareInputValue = shareInput.value;
+        const shareInputMessageValue = shareInputMessage?.value;
         const invalidMails = getInvalidEmails(
           shareInputValue.split(",").map((item) => item.trim())
         );
@@ -161,18 +157,44 @@ export async function insightPageCode({
           shareError.textContent = `Invalid mail(s) ${invalidMails.join()}`;
           toggleError({ errorDiv: shareError, value: false });
         } else {
-          const shareData = await shareInsight({
-            emails: shareInputValue,
-            insightSlug,
-            origin: window.location.origin,
-          });
+          //split email by comma and for each email, send a mail
+          const shareDataSet = new Set<string>();
+          const emails = shareInputValue.split(",");
+
+          // Get existing shares to merge with new ones
+          const existingShares = await getUserShares({ insightSlug });
+          if (existingShares && existingShares.length > 0) {
+            existingShares.forEach((share) => {
+              shareDataSet.add(share.shared_to);
+            });
+          }
+
+          // Share to each email and collect all unique shares
+          for (const email of emails) {
+            const share = await shareInsight({
+              emails: email.trim(),
+              message: shareInputMessageValue || "",
+              insightSlug,
+              origin: window.location.origin,
+            });
+
+            if (share && share.length > 0) {
+              share.forEach((item) => {
+                shareDataSet.add(item.shared_to);
+              });
+            }
+          }
+
+          const shareData = Array.from(shareDataSet);
+
           if (shareData && shareData.length > 0) {
             shareList.innerHTML = "";
-            shareData.map((share) => {
+            shareData.forEach((share) => {
               const shareItem = shareItemPlaceholder.cloneNode(
                 true
               ) as HTMLDivElement;
-              shareItem.textContent = share.shared_to;
+
+              shareItem.textContent = share;
               shareList.appendChild(shareItem);
             });
             shareListWrap.setAttribute("dev-hide", "false");
@@ -181,8 +203,6 @@ export async function insightPageCode({
           toggleError({ errorDiv: shareError, value: true });
         }
         shareSubmit.classList.remove("is-disabled");
-
-        console.log({ value: shareInput.value, insightSlug });
       });
     });
   }
@@ -204,16 +224,19 @@ export async function insightPageCode({
 
   async function shareInsight({
     emails,
+    message,
     insightSlug,
     origin,
   }: {
     origin: string;
     emails: string;
+    message: string;
     insightSlug: string;
   }) {
     try {
       const res = await xano_shared_insight_pages.post("/share_insight", {
         emails,
+        message,
         insightSlug,
         origin,
       });
@@ -221,7 +244,7 @@ export async function insightPageCode({
 
       return userSharesResponse;
     } catch (error) {
-      console.log("shareInsight_error", error);
+      console.error("shareInsight_error", error);
       return null;
     }
   }
@@ -234,10 +257,17 @@ export async function insightPageCode({
 
       return userSharesResponse;
     } catch (error) {
-      console.log("getUserShares_error", error);
+      console.error("getUserShares_error", error);
       return null;
     }
   }
+
+  const addTippyAttributes = (element: HTMLElement, content: string) => {
+    element.setAttribute("data-tippy-content", content);
+    element.setAttribute("data-tippy-placement", "left");
+    element.setAttribute("data-tippy-arrow", "true");
+    element.setAttribute("data-tippy-duration", "300");
+  };
 
   async function insightPageInit(insightSlug: string) {
     const insight = await getInsight(insightSlug);
@@ -478,11 +508,18 @@ export async function insightPageCode({
               ?.classList.add("hide")
           );
         } else {
-          companyCards.forEach((companyCard) =>
+          companyCards.forEach((companyCard) => {
             companyCard
               .querySelector(`[dev-target="empty-state"]`)
-              ?.classList.remove("hide")
-          );
+              ?.classList.remove("hide");
+            const header = companyCard.querySelector(
+              `[dev-target="companies-accordion-header"]`
+            ) as HTMLElement;
+            if (header) {
+              header.classList.add("is-disabled");
+              addTippyAttributes(companyCard, "No companies mentioned yet");
+            }
+          });
           companyWrapper?.classList.add("hide");
         }
       });
@@ -516,6 +553,18 @@ export async function insightPageCode({
           .querySelector(`[dev-target="empty-state"]`)
           ?.classList.remove("hide");
         sourceDocumentWrapper?.classList.add("hide");
+
+        const header = sourceDocumentCard.querySelector(
+          `[dev-target="source-accordion-header"]`
+        ) as HTMLElement;
+        if (header) {
+          header.classList.add("is-disabled");
+          //add tippy attributes
+          addTippyAttributes(
+            sourceDocumentCard,
+            "No source documents mentioned yet"
+          );
+        }
       }
 
       const peopleWrappers = Array.from(peopleCards).map(
@@ -558,11 +607,16 @@ export async function insightPageCode({
               ?.classList.add("hide")
           );
         } else {
-          peopleCards.forEach((peopleCard) =>
-            peopleCard
-              .querySelector(`[dev-target="empty-state"]`)
-              ?.classList.remove("hide")
-          );
+          peopleCards.forEach((peopleCard) => {
+            peopleCard.querySelector(`[dev-target="empty-state"]`)?.remove();
+            const header = peopleCard.querySelector(
+              `[dev-target="people-accordion-header"]`
+            ) as HTMLElement;
+            if (header) {
+              header.classList.add("is-disabled");
+              addTippyAttributes(peopleCard, "No people mentioned yet");
+            }
+          });
           peopleWrapper?.classList.add("hide");
         }
       });
@@ -585,18 +639,108 @@ export async function insightPageCode({
               ?.classList.add("hide")
           );
         } else {
-          eventCards.forEach((eventCard) =>
+          eventCards.forEach((eventCard) => {
             eventCard
               .querySelector(`[dev-target="empty-state"]`)
-              ?.classList.remove("hide")
-          );
+              ?.classList.remove("hide");
+            const header = eventWrapper.querySelector(
+              `[dev-target="event-accordion-header"]`
+            ) as HTMLElement;
+            if (header) {
+              header.classList.add("is-disabled");
+              addTippyAttributes(eventCard, "No events mentioned yet");
+            }
+          });
           eventWrapper?.classList.add("hide");
         }
       });
 
       insightTemplate.classList.remove("hide-template");
+
+      // Initialize table scroll
+      initTableScroll();
     }
   }
+
+ function initTableScroll() {
+  const figure = document.querySelector('figure.table') as HTMLElement;
+  if (!figure) return;
+
+  // Make sure the table can scroll horizontally
+  figure.style.overflowX = 'auto';
+
+  // Prevent double injection
+  if (figure.previousElementSibling?.classList.contains('top-scroll')) return;
+
+  // Create elements
+  const topScroll = document.createElement('div');
+  const topInner = document.createElement('div');
+
+  topScroll.className = 'top-scroll';
+  topInner.className = 'top-scroll-inner';
+
+  topScroll.appendChild(topInner);
+
+  // Required styles
+  Object.assign(topScroll.style, {
+    overflowX: 'auto',
+    overflowY: 'hidden',
+    width: `${figure.clientWidth}px`,
+    height: 'auto',
+    
+  });
+
+  Object.assign(topInner.style, {
+    width: figure.scrollWidth + 'px', // set initial width
+    height: '10px',
+  });
+
+    const style = document.createElement('style');
+  style.id = 'top-scrollbar-style';
+  style.innerHTML = `
+    .top-scroll::-webkit-scrollbar {
+      height: 7px;
+    }
+    .top-scroll::-webkit-scrollbar-thumb {
+      background: #888;
+      border-radius: 8px;
+    }
+    .top-scroll::-webkit-scrollbar-track {
+      background: #f0f0f0;
+    }
+  `;
+  document.head.appendChild(style);
+
+  // Inject ABOVE figure
+  figure.parentNode?.insertBefore(topScroll, figure);
+
+  // Sync sizes
+  const sync = () => {
+    topScroll.style.width = figure.clientWidth + 'px';
+    topInner.style.width = figure.scrollWidth + 'px';
+
+    // Hide if no overflow
+    topScroll.style.display =
+      figure.scrollWidth > figure.clientWidth ? 'block' : 'none';
+  };
+
+  // Sync scroll positions
+  topScroll.addEventListener('scroll', () => {
+    figure.scrollLeft = topScroll.scrollLeft;
+  });
+
+  figure.addEventListener('scroll', () => {
+    topScroll.scrollLeft = figure.scrollLeft;
+  });
+
+  // Observe changes
+  new ResizeObserver(sync).observe(figure);
+  sync();
+
+  // Also sync after images load (tables with images can change width)
+  window.addEventListener('load', sync);
+}
+
 
   async function getInsight(slug: string) {
     try {
@@ -609,10 +753,9 @@ export async function insightPageCode({
       }
       qs("title").textContent = insightResponse.name;
 
-      // console.log("insightResponse", insightResponse);
       return insightResponse;
     } catch (error) {
-      console.log("getInsight_error", error);
+      console.error("getInsight_error", error);
       return null;
     }
   }
@@ -627,7 +770,7 @@ export async function insightPageCode({
       xano_userFeed.setAuthToken(xanoAuthToken);
       return xanoAuthToken;
     } catch (error) {
-      console.log("getXanoAccessToken_error", error);
+      console.error("getXanoAccessToken_error", error);
       return null;
     }
   }
@@ -742,10 +885,8 @@ export async function insightPageCode({
         id: Number(id),
         target: type,
       });
-      console.log("userFollowingAndFavourite-1", userFollowingAndFavourite);
+
       await getUserFollowingAndFavourite();
-      // run function to updated all-tab inputs
-      console.log("userFollowingAndFavourite-2", userFollowingAndFavourite);
 
       // update company checkboxes
       const companyInputs = qsa<HTMLInputElement>(
