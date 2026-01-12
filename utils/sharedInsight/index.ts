@@ -263,11 +263,18 @@ export async function sharedInsightPageCode({
                 ?.classList.add("hide")
             );
           } else {
-            companyCards.forEach((companyCard) =>
+            companyCards.forEach((companyCard) => {
               companyCard
                 .querySelector(`[dev-target="empty-state"]`)
-                ?.classList.remove("hide")
-            );
+                ?.classList.remove("hide");
+              const header = companyCard.querySelector(
+                `[dev-target="companies-accordion-header"]`
+              ) as HTMLElement;
+              if (header) {
+                header.classList.add("is-disabled");
+                addTippyAttributes(companyCard, "No companies mentioned yet");
+              }
+            });
             companyWrapper?.classList.add("hide");
           }
         });
@@ -301,6 +308,13 @@ export async function sharedInsightPageCode({
           sourceDocumentCard
             .querySelector(`[dev-target="empty-state"]`)
             ?.classList.remove("hide");
+          const header = sourceDocumentCard.querySelector(
+            `[dev-target="documents-accordion-header"]`
+          ) as HTMLElement;
+          if (header) {
+            header.classList.add("is-disabled");
+            addTippyAttributes(sourceDocumentCard, "No source documents yet");
+          }
           sourceDocumentWrapper?.classList.add("hide");
         }
 
@@ -346,11 +360,18 @@ export async function sharedInsightPageCode({
                 ?.classList.add("hide")
             );
           } else {
-            peopleCards.forEach((peopleCard) =>
+            peopleCards.forEach((peopleCard) => {
               peopleCard
                 .querySelector(`[dev-target="empty-state"]`)
-                ?.classList.remove("hide")
-            );
+                ?.classList.remove("hide");
+              const header = peopleCard.querySelector(
+                `[dev-target="people-accordion-header"]`
+              ) as HTMLElement;
+              if (header) {
+                header.classList.add("is-disabled");
+                addTippyAttributes(peopleCard, "No people mentioned yet");
+              }
+            });
             peopleWrapper?.classList.add("hide");
           }
         });
@@ -374,11 +395,18 @@ export async function sharedInsightPageCode({
                 ?.classList.add("hide")
             );
           } else {
-            eventCards.forEach((eventCard) =>
+            eventCards.forEach((eventCard) => {
               eventCard
                 .querySelector(`[dev-target="empty-state"]`)
-                ?.classList.remove("hide")
-            );
+                ?.classList.remove("hide");
+              const header = eventCard.querySelector(
+                `[dev-target="events-accordion-header"]`
+              ) as HTMLElement;
+              if (header) {
+                header.classList.add("is-disabled");
+                addTippyAttributes(eventCard, "No events mentioned yet");
+              }
+            });
             eventWrapper?.classList.add("hide");
           }
         });
